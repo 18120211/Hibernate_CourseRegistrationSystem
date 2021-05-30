@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="com.vtm.course_registration_system.models.CourseregistrationEntity" table="courseregistration"
+           schema="course_registration_system">
+        <id name="id">
+            <column name="ID" sql-type="int(11)"/>
+        </id>
+        <property name="registraiondate">
+            <column name="REGISTRAIONDATE" sql-type="datetime" not-null="true"/>
+        </property>
+        <many-to-one name="studentByIdsv" class="com.vtm.course_registration_system.models.StudentEntity" lazy="false" cascade="save-update">
+            <column name="IDSV" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="courseByIdco" class="com.vtm.course_registration_system.models.CourseEntity" lazy="false" cascade="save-update">
+            <column name="IDCO" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

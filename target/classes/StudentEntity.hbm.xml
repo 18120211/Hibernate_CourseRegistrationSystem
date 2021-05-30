@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="com.vtm.course_registration_system.models.StudentEntity" table="student"
+           schema="course_registration_system">
+        <id name="id">
+            <column name="ID" sql-type="int(11)"/>
+        </id>
+        <property name="code">
+            <column name="CODE" sql-type="char(10)" length="10" not-null="true"/>
+        </property>
+        <property name="name">
+            <column name="NAME" sql-type="varchar(100)" length="100" not-null="true"/>
+        </property>
+        <property name="sex">
+            <column name="SEX" sql-type="varchar(3)" length="3" not-null="true"/>
+        </property>
+        <property name="birth">
+            <column name="BIRTH" sql-type="date" not-null="true"/>
+        </property>
+        <property name="numsubject">
+            <column name="NUMSUBJECT" sql-type="int(11)" not-null="true"/>
+        </property>
+        <many-to-one name="classByIdcl" class="com.vtm.course_registration_system.models.ClassEntity" lazy="false" cascade="save-update">
+            <column name="IDCL" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

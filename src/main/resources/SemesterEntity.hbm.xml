@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="com.vtm.course_registration_system.models.SemesterEntity" table="semester"
+           schema="course_registration_system">
+        <id name="id">
+            <column name="ID" sql-type="int(11)"/>
+        </id>
+        <property name="name">
+            <column name="NAME" sql-type="char(3)" length="3" not-null="true"/>
+        </property>
+        <property name="year">
+            <column name="YEAR" sql-type="int(11)" not-null="true"/>
+        </property>
+        <property name="startdate">
+            <column name="STARTDATE" sql-type="date" not-null="true"/>
+        </property>
+        <property name="enddate">
+            <column name="ENDDATE" sql-type="date" not-null="true"/>
+        </property>
+    </class>
+</hibernate-mapping>
