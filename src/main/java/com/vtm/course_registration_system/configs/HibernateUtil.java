@@ -1,4 +1,4 @@
-package com.vtm.course_registration_system;
+package com.vtm.course_registration_system.configs;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;

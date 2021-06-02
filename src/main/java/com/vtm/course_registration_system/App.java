@@ -60,10 +60,7 @@ public class App {
 //        CourseregistrationDao.add(courseregistrationEntity);
 //
         ArrayList<CourseregistrationEntity> list = (ArrayList<CourseregistrationEntity>) CourseregistrationDao.getList();
-        for (CourseregistrationEntity object :
-                list) {
-            System.out.println(object);
-        }
+        list.forEach(obj -> System.out.println(obj));
 
     }
 }

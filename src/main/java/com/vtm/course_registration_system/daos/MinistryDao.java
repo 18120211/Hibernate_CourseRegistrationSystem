@@ -1,6 +1,6 @@
 package com.vtm.course_registration_system.daos;
 
-import com.vtm.course_registration_system.HibernateUtil;
+import com.vtm.course_registration_system.configs.HibernateUtil;
 import com.vtm.course_registration_system.models.MinistryEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;

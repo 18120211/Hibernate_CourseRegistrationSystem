@@ -1,9 +1,8 @@
 package com.vtm.course_registration_system.daos;
 
-import com.vtm.course_registration_system.HibernateUtil;
+import com.vtm.course_registration_system.configs.HibernateUtil;
 import com.vtm.course_registration_system.models.ClassEntity;
 import com.vtm.course_registration_system.models.StudentEntity;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
