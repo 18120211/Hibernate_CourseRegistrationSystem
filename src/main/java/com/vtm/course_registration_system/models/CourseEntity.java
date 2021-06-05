@@ -122,6 +122,17 @@ public class CourseEntity {
         this.courseregistrationsessionByIdcrs = courseregistrationsessionByIdcrs;
     }
 
+    public CourseEntity(String name, Integer year, String teacher, String room, String day, Integer shift, SubjectEntity subjectByIdsu, MinistryEntity ministryByIdmi, CourseregistrationsessionEntity courseregistrationsessionByIdcrs) {
+        this.name = name;
+        this.year = year;
+        this.teacher = teacher;
+        this.room = room;
+        this.day = day;
+        this.shift = shift;
+        this.subjectByIdsu = subjectByIdsu;
+        this.ministryByIdmi = ministryByIdmi;
+        this.courseregistrationsessionByIdcrs = courseregistrationsessionByIdcrs;
+    }
     @Override
     public String toString() {
         return "CourseEntity{" +

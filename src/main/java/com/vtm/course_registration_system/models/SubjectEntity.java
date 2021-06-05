@@ -49,6 +49,13 @@ public class SubjectEntity {
         this.numcredit = numcredit;
     }
 
+    public SubjectEntity(String code, String name, Integer numcredit) {
+        this.code = code;
+        this.name = name;
+        this.numcredit = numcredit;
+    }
+
+
     @Override
     public String toString() {
         return "SubjectEntity{" +

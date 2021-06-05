@@ -92,7 +92,7 @@ public class ClassDao {
         ArrayList<StudentEntity> list = (ArrayList<StudentEntity>)StudentDao.getList();
         for (StudentEntity studentEntity :
                 list) {
-            StudentDao.deleteStudent(studentEntity.getId());
+            StudentDao.delete(studentEntity.getId());
         }
         Session session = HibernateUtil.getSession();
         Transaction transaction = session.beginTransaction();

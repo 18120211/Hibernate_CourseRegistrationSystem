@@ -62,6 +62,12 @@ public class ClassEntity {
         this.numfemale = numfemale;
     }
 
+    public ClassEntity(String name, Integer nummale, Integer numfemale) {
+        this.name = name;
+        this.nummale = nummale;
+        this.numfemale = numfemale;
+    }
+
     @Override
     public String toString() {
         return "ClassEntity{" +

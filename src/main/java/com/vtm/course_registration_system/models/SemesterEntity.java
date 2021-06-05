@@ -60,6 +60,13 @@ public class SemesterEntity implements Serializable {
         this.startdate = startdate;
         this.enddate = enddate;
     }
+    public SemesterEntity(String name, Integer year, Date startdate, Date enddate) {
+        this.name = name;
+        this.year = year;
+        this.startdate = startdate;
+        this.enddate = enddate;
+    }
+
 
     @Override
     public String toString() {

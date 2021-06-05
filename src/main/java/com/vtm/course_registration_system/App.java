@@ -1,55 +1,22 @@
 package com.vtm.course_registration_system;
 
+import com.vtm.course_registration_system.configs.Local;
 import com.vtm.course_registration_system.daos.*;
-import com.vtm.course_registration_system.models.*;
+import com.vtm.course_registration_system.models.CourseregistrationEntity;
+import com.vtm.course_registration_system.models.SemesterEntity;
+import com.vtm.course_registration_system.models.StudentEntity;
 
-
-import javax.security.auth.Subject;
 import java.io.*;
-import java.nio.Buffer;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
 
 public class App {
-    public static SemesterEntity currentSemester;
 
-    public static Boolean readCurrentSemester() {
-        try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(new File("src/main/resources/CurrentSemester.dat")));
-            App.currentSemester = (SemesterEntity)objectInputStream.readObject();
-            objectInputStream.close();
-            return true;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
-    public static Boolean updateCurrentSemester() {
-        try {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(new File("src/main/resources/CurrentSemester.dat")));
-            objectOutputStream.writeObject(App.currentSemester);
-            objectOutputStream.close();
-            return true;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
     public static void main(String[] args) {
-        App.readCurrentSemester();
-        System.out.println(App.currentSemester);
+        Local.readCurrentSemester();
+        System.out.println(Local.currentSemester);
 
 //        Timestamp registrationDate = new Timestamp(211, 8, 16, 10, 0, 0, 0);
 //        CourseregistrationEntity courseregistrationEntity = new CourseregistrationEntity(2,registrationDate
@@ -59,8 +26,21 @@ public class App {
 //                , StudentDao.get(2), CourseDao.get(2));
 //        CourseregistrationDao.add(courseregistrationEntity);
 //
-        ArrayList<CourseregistrationEntity> list = (ArrayList<CourseregistrationEntity>) CourseregistrationDao.getList();
-        list.forEach(obj -> System.out.println(obj));
+
+//        Date date = new Date(211, 5, 5);
+//        StudentEntity studentEntity = new StudentEntity("temp", "temp", "Nam",
+//                date, 5, ClassDao.get(1));
+//        StudentDao.add(studentEntity);
+//
+
+//        CourseregistrationEntity courseregistrationEntity = new CourseregistrationEntity(
+//                new Timestamp(211, 11, 16, 0, 0, 0, 0),
+//                StudentDao.get(1), CourseDao.get(1)
+//        );
+//        CourseregistrationDao.add(courseregistrationEntity);
+//        ArrayList<CourseregistrationEntity> list = (ArrayList<CourseregistrationEntity>) CourseregistrationDao.getList();
+//        list.forEach(obj -> System.out.println(obj));
+
 
     }
 }

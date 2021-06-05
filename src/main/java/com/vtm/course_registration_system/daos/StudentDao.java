@@ -106,7 +106,7 @@ public class StudentDao {
         return true;
     }
 
-    public static Boolean deleteStudent(int id) {
+    public static Boolean delete(int id) {
         StudentEntity studentEntity = StudentDao.get(id);
         if (studentEntity == null) {
             return false;

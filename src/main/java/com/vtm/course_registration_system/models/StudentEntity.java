@@ -93,6 +93,15 @@ public class StudentEntity {
         this.classByIdcl = classByIdcl;
     }
 
+    public StudentEntity(String code, String name, String sex, Date birth, Integer numsubject, ClassEntity classByIdcl) {
+        this.code = code;
+        this.name = name;
+        this.sex = sex;
+        this.birth = birth;
+        this.numsubject = numsubject;
+        this.classByIdcl = classByIdcl;
+    }
+
     @Override
     public String toString() {
         return "StudentEntity{" +

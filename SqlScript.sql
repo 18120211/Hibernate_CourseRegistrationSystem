@@ -64,7 +64,7 @@ create table COURSEREGISTRATIONSESSION(
 );
 
 create table COURSE(
-	ID int,
+	ID int auto_increment,
     NAME nvarchar(100),
     YEAR int,
     TEACHER nvarchar(100),
@@ -76,10 +76,12 @@ create table COURSE(
     IDCRS int,
     constraint pk_co primary key(ID),
     constraint ck_co_day check(DAY in ('Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7')),
+	constraint ck_co_sh check(SHIFT in (1, 2, 3, 4)),
     constraint fk_co_su foreign key(IDSU) references SUBJECT(ID),
     constraint fk_co_mi foreign key(IDMI) references MINISTRY(ID),
     constraint fk_co_crs foreign key(IDCRS) references COURSEREGISTRATIONSESSION(ID)
 );
+
 
 create table COURSEREGISTRATION (
 	ID int auto_increment,

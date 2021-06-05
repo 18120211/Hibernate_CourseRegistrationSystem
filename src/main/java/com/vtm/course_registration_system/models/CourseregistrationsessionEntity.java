@@ -63,6 +63,12 @@ public class CourseregistrationsessionEntity {
         this.semesterByIdse = semesterByIdse;
     }
 
+    public CourseregistrationsessionEntity(Date startdate, Date enddate, SemesterEntity semesterByIdse) {
+        this.startdate = startdate;
+        this.enddate = enddate;
+        this.semesterByIdse = semesterByIdse;
+    }
+
     @Override
     public String toString() {
         return "CourseregistrationsessionEntity{" +

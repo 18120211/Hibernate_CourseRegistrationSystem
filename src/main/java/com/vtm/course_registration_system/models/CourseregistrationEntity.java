@@ -63,6 +63,12 @@ public class CourseregistrationEntity {
         this.courseByIdco = courseByIdco;
     }
 
+    public CourseregistrationEntity(Timestamp registraiondate, StudentEntity studentByIdsv, CourseEntity courseByIdco) {
+        this.registraiondate = registraiondate;
+        this.studentByIdsv = studentByIdsv;
+        this.courseByIdco = courseByIdco;
+    }
+
     @Override
     public String toString() {
         return "CourseregistrationEntity{" +

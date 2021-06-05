@@ -49,6 +49,12 @@ public class MinistryEntity {
         this.name = name;
     }
 
+    public MinistryEntity(String username, String password, String name) {
+        this.username = username;
+        this.password = password;
+        this.name = name;
+    }
+
     @Override
     public String toString() {
         return "MinistryEntity{" +
