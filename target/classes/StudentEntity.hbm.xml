@@ -9,6 +9,12 @@
         <id name="id">
             <column name="ID" sql-type="int(11)"/>
         </id>
+        <property name="username">
+            <column name="USERNAME" sql-type="varchar(30)" length="30" not-null="true"/>
+        </property>
+        <property name="password">
+            <column name="PASSWORD" sql-type="varchar(30)" length="30" not-null="true"/>
+        </property>
         <property name="code">
             <column name="CODE" sql-type="char(10)" length="10" not-null="true"/>
         </property>

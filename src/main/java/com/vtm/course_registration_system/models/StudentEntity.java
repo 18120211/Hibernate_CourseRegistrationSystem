@@ -5,6 +5,8 @@ import java.util.Objects;
 
 public class StudentEntity {
     private int id;
+    private String username;
+    private String password;
     private String code;
     private String name;
     private String sex;
@@ -60,6 +62,14 @@ public class StudentEntity {
         this.numsubject = numsubject;
     }
 
+    public String getUsername() { return username; }
+
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPassword() { return password; }
+
+    public void setPassword(String password) { this.password = password; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -83,8 +93,12 @@ public class StudentEntity {
 
     public StudentEntity(){}
 
-    public StudentEntity(int id, String code, String name, String sex, Date birth, Integer numsubject, ClassEntity classByIdcl) {
+    public StudentEntity(int id, String username, String password, String code,
+                         String name, String sex, Date birth, Integer numsubject,
+                         ClassEntity classByIdcl) {
         this.id = id;
+        this.username = username;
+        this.password = password;
         this.code = code;
         this.name = name;
         this.sex = sex;
@@ -93,7 +107,10 @@ public class StudentEntity {
         this.classByIdcl = classByIdcl;
     }
 
-    public StudentEntity(String code, String name, String sex, Date birth, Integer numsubject, ClassEntity classByIdcl) {
+    public StudentEntity(String username, String password, String code, String name,
+                         String sex, Date birth, Integer numsubject, ClassEntity classByIdcl) {
+        this.username = username;
+        this.password = password;
         this.code = code;
         this.name = name;
         this.sex = sex;
@@ -106,6 +123,8 @@ public class StudentEntity {
     public String toString() {
         return "StudentEntity{" +
                 "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
                 ", code='" + code + '\'' +
                 ", name='" + name + '\'' +
                 ", sex='" + sex + '\'' +

@@ -33,14 +33,11 @@ public class App {
 //        StudentDao.add(studentEntity);
 //
 
-//        CourseregistrationEntity courseregistrationEntity = new CourseregistrationEntity(
-//                new Timestamp(211, 11, 16, 0, 0, 0, 0),
-//                StudentDao.get(1), CourseDao.get(1)
-//        );
-//        CourseregistrationDao.add(courseregistrationEntity);
-//        ArrayList<CourseregistrationEntity> list = (ArrayList<CourseregistrationEntity>) CourseregistrationDao.getList();
-//        list.forEach(obj -> System.out.println(obj));
-
+//        StudentEntity studentEntity = new StudentEntity("temp", "temp", "Nam",
+//                Date.valueOf("2000-1-1"), 0, ClassDao.get(1));
+//        StudentDao.add(studentEntity);
+        ArrayList<StudentEntity> list = (ArrayList<StudentEntity>) StudentDao.getList();
+        list.forEach(obj -> System.out.println(obj));
 
     }
 }
