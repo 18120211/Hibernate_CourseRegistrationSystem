@@ -3,6 +3,7 @@ package com.vtm.course_registration_system;
 import com.vtm.course_registration_system.configs.Local;
 import com.vtm.course_registration_system.daos.*;
 import com.vtm.course_registration_system.models.CourseregistrationEntity;
+import com.vtm.course_registration_system.models.MinistryEntity;
 import com.vtm.course_registration_system.models.SemesterEntity;
 import com.vtm.course_registration_system.models.StudentEntity;
 
@@ -36,8 +37,8 @@ public class App {
 //        StudentEntity studentEntity = new StudentEntity("temp", "temp", "Nam",
 //                Date.valueOf("2000-1-1"), 0, ClassDao.get(1));
 //        StudentDao.add(studentEntity);
-        ArrayList<StudentEntity> list = (ArrayList<StudentEntity>) StudentDao.getList();
+        ArrayList<MinistryEntity> list = (ArrayList<MinistryEntity>) MinistryDao.getList();
         list.forEach(obj -> System.out.println(obj));
-
+        Object tmp = StudentDao.get(1);
     }
 }
