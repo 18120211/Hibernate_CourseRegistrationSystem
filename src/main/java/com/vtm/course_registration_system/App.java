@@ -37,8 +37,10 @@ public class App {
 //        StudentEntity studentEntity = new StudentEntity("temp", "temp", "Nam",
 //                Date.valueOf("2000-1-1"), 0, ClassDao.get(1));
 //        StudentDao.add(studentEntity);
-        ArrayList<MinistryEntity> list = (ArrayList<MinistryEntity>) MinistryDao.getList();
+
+//        StudentDao.delete(4);
+
+        ArrayList<StudentEntity> list = (ArrayList<StudentEntity>) StudentDao.getList();
         list.forEach(obj -> System.out.println(obj));
-        Object tmp = StudentDao.get(1);
     }
 }
