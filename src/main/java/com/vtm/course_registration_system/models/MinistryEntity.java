@@ -4,9 +4,10 @@ import java.util.Objects;
 
 public class MinistryEntity {
     private int id;
+    private String name;
     private String username;
     private String password;
-    private String name;
+
 
     public int getId() {
         return id;
@@ -53,6 +54,15 @@ public class MinistryEntity {
         this.username = username;
         this.password = password;
         this.name = name;
+    }
+
+    public Object[] toArray() {
+        Object[] arr = new Object[4];
+        arr[0] = this.id;
+        arr[1] = this.name;
+        arr[2] = this.username;
+        arr[3] = this.password;
+        return arr;
     }
 
     @Override

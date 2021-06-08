@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MinistryDao {
@@ -20,9 +21,22 @@ public class MinistryDao {
 
     public static MinistryEntity get(int id) {
         Session session = HibernateUtil.getSession();
-        MinistryEntity ministryEntity =session.get(MinistryEntity.class, id);
+        MinistryEntity ministryEntity = session.get(MinistryEntity.class, id);
         session.close();
         return ministryEntity;
+    }
+
+    public static Object[][] getDataTable() {
+        Session session = HibernateUtil.getSession();
+        String hql = "select mi from MinistryEntity mi";
+        Query query = session.createQuery(hql);
+        ArrayList<MinistryEntity> list = (ArrayList<MinistryEntity>) query.list();
+        Object[][] dataTable = new Object[list.size()][];
+        for (int i = 0; i < list.size(); i++) {
+            dataTable[i] = list.get(i).toArray();
+        }
+        session.close();
+        return dataTable;
     }
 
     public static Boolean add(MinistryEntity ministryEntity) {
