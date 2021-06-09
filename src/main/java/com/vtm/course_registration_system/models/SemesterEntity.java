@@ -79,6 +79,16 @@ public class SemesterEntity implements Serializable {
                 '}';
     }
 
+    public Object[] toArray() {
+        Object[] array = new Object[5];
+        array[0] = this.id;
+        array[1] = this.name;
+        array[2] = this.year;
+        array[3] = this.startdate;
+        array[4] = this.enddate;
+        return array;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -1,11 +1,13 @@
 package com.vtm.course_registration_system.daos;
 
 import com.vtm.course_registration_system.configs.HibernateUtil;
+import com.vtm.course_registration_system.models.CourseregistrationsessionEntity;
 import com.vtm.course_registration_system.models.SemesterEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SemesterDao {
@@ -23,6 +25,15 @@ public class SemesterDao {
         SemesterEntity semesterEntity = session.get(SemesterEntity.class, id);
         session.close();
         return semesterEntity;
+    }
+
+    public static Object[][] getTableData() {
+        ArrayList<SemesterEntity> list = (ArrayList<SemesterEntity>) SemesterDao.getList();
+        Object[][] dataTable = new Object[list.size()][];
+        for (int i = 0; i < list.size(); i++) {
+            dataTable[i] = list.get(i).toArray();
+        }
+        return dataTable;
     }
 
     public static Boolean add(SemesterEntity semesterEntity) {

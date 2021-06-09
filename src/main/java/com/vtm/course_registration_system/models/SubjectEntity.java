@@ -66,6 +66,15 @@ public class SubjectEntity {
                 '}';
     }
 
+    public Object[] toArray() {
+        Object[] array = new Object[4];
+        array[0] = this.id;
+        array[1] = this.name;
+        array[2] = this.code;
+        array[3] = this.numcredit;
+        return array;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

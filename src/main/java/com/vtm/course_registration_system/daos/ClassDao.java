@@ -2,6 +2,7 @@ package com.vtm.course_registration_system.daos;
 
 import com.vtm.course_registration_system.configs.HibernateUtil;
 import com.vtm.course_registration_system.models.ClassEntity;
+import com.vtm.course_registration_system.models.MinistryEntity;
 import com.vtm.course_registration_system.models.StudentEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -22,6 +23,15 @@ public class ClassDao {
         ClassEntity classEntity = session.get(ClassEntity.class, id);
         session.close();
         return classEntity;
+    }
+
+    public static Object[][] getTableData() {
+        ArrayList<ClassEntity> list = (ArrayList<ClassEntity>) ClassDao.getList();
+        Object[][] dataTable = new Object[list.size()][];
+        for (int i = 0; i < list.size(); i++) {
+            dataTable[i] = list.get(i).toArray();
+        }
+        return dataTable;
     }
     public static Boolean add(ClassEntity classEntity) {
         if (ClassDao.get(classEntity.getId()) != null) {

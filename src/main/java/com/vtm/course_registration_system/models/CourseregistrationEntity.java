@@ -78,4 +78,18 @@ public class CourseregistrationEntity {
                 ", courseByIdco=" + courseByIdco +
                 '}';
     }
+
+
+    public Object[] toArray() {
+        Object[] array = new Object[7];
+        array[0] = this.studentByIdsv.getCode();
+        array[1] = this.studentByIdsv.getName();
+        array[2] = this.courseByIdco.getSubjectByIdsu().getCode();
+        array[3] = this.courseByIdco.getSubjectByIdsu().getName();
+        array[4] = this.courseByIdco.getTeacher();
+        array[5] = this.courseByIdco.getShift();
+        array[6] = this.registraiondate;
+        return array;
+    }
+
 }

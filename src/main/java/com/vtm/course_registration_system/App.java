@@ -40,7 +40,6 @@ public class App {
 
 //        StudentDao.delete(4);
 
-        ArrayList<StudentEntity> list = (ArrayList<StudentEntity>) StudentDao.getList();
-        list.forEach(obj -> System.out.println(obj));
+        Master.getInstance().run();
     }
 }

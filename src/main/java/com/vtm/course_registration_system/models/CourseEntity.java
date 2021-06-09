@@ -148,4 +148,17 @@ public class CourseEntity {
                 ", courseregistrationsessionByIdcrs" + courseregistrationsessionByIdcrs +
                 '}';
     }
+
+    public Object[] toArray() {
+        Object[] array = new Object[8];
+        array[0] = this.id;
+        array[1] = this.subjectByIdsu.getCode();
+        array[2] = this.subjectByIdsu.getName();
+        array[3] = this.subjectByIdsu.getNumcredit();
+        array[4] = this.teacher;
+        array[5] = this.room;
+        array[6] = this.day;
+        array[7] = this.shift;
+        return array;
+    }
 }

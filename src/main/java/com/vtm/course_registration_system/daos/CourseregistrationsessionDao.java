@@ -1,10 +1,12 @@
 package com.vtm.course_registration_system.daos;
 
 import com.vtm.course_registration_system.configs.HibernateUtil;
+import com.vtm.course_registration_system.models.CourseregistrationEntity;
 import com.vtm.course_registration_system.models.CourseregistrationsessionEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CourseregistrationsessionDao {
@@ -15,12 +17,24 @@ public class CourseregistrationsessionDao {
         session.close();
         return list;
     }
+
     public static CourseregistrationsessionEntity get(int id) {
         Session session = HibernateUtil.getSession();
         CourseregistrationsessionEntity courseregistrationsessionEntity = session.get(CourseregistrationsessionEntity.class, id);
         session.close();
         return courseregistrationsessionEntity;
     }
+
+    public static Object[][] getTableData() {
+        ArrayList<CourseregistrationsessionEntity> list =
+                (ArrayList<CourseregistrationsessionEntity>) CourseregistrationsessionDao.getList();
+        Object[][] dataTable = new Object[list.size()][];
+        for (int i = 0; i < list.size(); i++) {
+            dataTable[i] = list.get(i).toArray();
+        }
+        return dataTable;
+    }
+
     public static Boolean add(CourseregistrationsessionEntity courseregistrationsessionEntity) {
         if(CourseregistrationsessionDao.get(courseregistrationsessionEntity.getId()) != null) {
             return false;

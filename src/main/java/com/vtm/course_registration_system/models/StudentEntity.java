@@ -133,4 +133,17 @@ public class StudentEntity {
                 ", classByIdcl=" + classByIdcl +
                 '}';
     }
+
+    public Object[] toArray() {
+        Object[] array = new Object[8];
+        array[0] = this.id;
+        array[1] = this.name;
+        array[2] = this.code;
+        array[3] = this.username;
+        array[4] = this.sex;
+        array[5] = this.birth;
+        array[6] = this.numsubject;
+        array[7] = this.classByIdcl.getName();
+        return array;
+    }
 }

@@ -5,6 +5,9 @@
  */
 package com.vtm.course_registration_system.jframes;
 
+import com.vtm.course_registration_system.Master;
+import com.vtm.course_registration_system.enums.UserType;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JOptionPane;
@@ -35,7 +38,23 @@ public class Login extends javax.swing.JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             super.mouseClicked(e); //To change body of generated methods, choose Tools | Templates.
-            JOptionPane.showMessageDialog(null, "Hello");
+            String username = Login.this.userField.getText();
+            String password = Login.this.passField.getText();
+            UserType userType;
+            if ((userType = Master.login(username, password)) == null) {
+                JOptionPane.showMessageDialog(null,
+                        "Tài khoản hoặc mật khẩu sai", "Lỗi Đăng nhập", JOptionPane.ERROR_MESSAGE);
+            }
+            else {
+                Login.this.dispose();
+                if (userType == UserType.STUDENT) {
+                    Portal.main(null);
+                }
+                else if (userType == UserType.MINISTRY) {
+                    Dashboard.main(null);
+
+                }
+            }
         }
         
     }

@@ -7,10 +7,10 @@ import com.vtm.course_registration_system.models.SemesterEntity;
 import java.io.*;
 
 public class Local {
-    public static String userID;
+    public static int userID;
     public static UserType userType;
     public static Boolean isAuthenticated;
-    public static Boolean isLogged;
+    public static Object user;
     public static SemesterEntity currentSemester;
 
     public static Boolean readCurrentSemester() {

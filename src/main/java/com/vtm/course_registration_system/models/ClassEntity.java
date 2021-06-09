@@ -77,4 +77,13 @@ public class ClassEntity {
                 ", numfemale=" + numfemale +
                 '}';
     }
+
+    public Object[] toArray() {
+        Object[] array = new Object[4];
+        array[0] = this.id;
+        array[1] = this.name;
+        array[2] = this.nummale;
+        array[3] = this.numfemale;
+        return array;
+    }
 }

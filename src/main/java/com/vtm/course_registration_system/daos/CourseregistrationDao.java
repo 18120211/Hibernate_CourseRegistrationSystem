@@ -1,11 +1,13 @@
 package com.vtm.course_registration_system.daos;
 
 import com.vtm.course_registration_system.configs.HibernateUtil;
+import com.vtm.course_registration_system.models.CourseEntity;
 import com.vtm.course_registration_system.models.CourseregistrationEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CourseregistrationDao {
@@ -16,7 +18,6 @@ public class CourseregistrationDao {
         List list = query.list();
         session.close();
         return list;
-//        return session.createQuery(hql).list();
     }
 
     public static CourseregistrationEntity get(int id) {
@@ -25,6 +26,42 @@ public class CourseregistrationDao {
         session.close();
         return courseregistrationEntity;
     }
+
+    public static Object[][] getTableData() {
+        ArrayList<CourseregistrationEntity> list = (ArrayList<CourseregistrationEntity>) CourseregistrationDao.getList();
+        Object[][] dataTable = new Object[list.size()][];
+        for (int i = 0; i < list.size(); i++) {
+            dataTable[i] = list.get(i).toArray();
+        }
+        return dataTable;
+    }
+
+    public static Object[][] getTableData(int idCourse) {
+        ArrayList<CourseregistrationEntity> tmp = (ArrayList<CourseregistrationEntity>) CourseregistrationDao.getList();
+        ArrayList<CourseregistrationEntity> list = new ArrayList<>();
+        for (int i = 0; i < tmp.size(); i++) {
+            if(tmp.get(i).getCourseByIdco().getId() == idCourse) {
+                list.add(tmp.get(i));
+            }
+        }
+        Object[][] dataTable = new Object[list.size()][];
+        for (int i = 0; i < list.size(); i++) {
+            dataTable[i] = list.get(i).toArray();
+        }
+        return dataTable;
+    }
+
+    public static Boolean isRegistered(int idStudent, int idCourse) {
+        ArrayList<CourseregistrationEntity> list =
+                (ArrayList<CourseregistrationEntity>) CourseregistrationDao.getList();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getCourseByIdco().getId() == idCourse && list.get(i).getStudentByIdsv().getId() == idStudent) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public static Boolean add(CourseregistrationEntity courseregistrationEntity) {
         if (CourseregistrationDao.get(courseregistrationEntity.getId()) != null) {

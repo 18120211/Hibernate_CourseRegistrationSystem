@@ -26,16 +26,12 @@ public class MinistryDao {
         return ministryEntity;
     }
 
-    public static Object[][] getDataTable() {
-        Session session = HibernateUtil.getSession();
-        String hql = "select mi from MinistryEntity mi";
-        Query query = session.createQuery(hql);
-        ArrayList<MinistryEntity> list = (ArrayList<MinistryEntity>) query.list();
+    public static Object[][] getTableData() {
+        ArrayList<MinistryEntity> list = (ArrayList<MinistryEntity>) MinistryDao.getList();
         Object[][] dataTable = new Object[list.size()][];
         for (int i = 0; i < list.size(); i++) {
             dataTable[i] = list.get(i).toArray();
         }
-        session.close();
         return dataTable;
     }
 

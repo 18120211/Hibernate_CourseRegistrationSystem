@@ -78,4 +78,13 @@ public class CourseregistrationsessionEntity {
                 ", semesterByIdse=" + semesterByIdse +
                 '}';
     }
+
+    public Object[] toArray() {
+        Object[] array = new Object[4];
+        array[0] = this.id;
+        array[1] = this.startdate;
+        array[2] = this.enddate;
+        array[3] = this.semesterByIdse.getName();
+        return array;
+    }
 }
