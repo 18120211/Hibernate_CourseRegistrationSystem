@@ -1,5 +1,6 @@
 package com.vtm.course_registration_system;
 
+import com.vtm.course_registration_system.configs.HibernateUtil;
 import com.vtm.course_registration_system.configs.Local;
 import com.vtm.course_registration_system.daos.*;
 import com.vtm.course_registration_system.enums.UserType;
@@ -8,6 +9,7 @@ import com.vtm.course_registration_system.jframes.Login;
 import com.vtm.course_registration_system.jframes.Portal;
 import com.vtm.course_registration_system.models.MinistryEntity;
 import com.vtm.course_registration_system.models.StudentEntity;
+import org.hibernate.Session;
 
 import java.util.ArrayList;
 
@@ -15,8 +17,9 @@ public class Master {
     private static Master instance;
 
     private Master() {
-        Dashboard.listMinitry = MinistryDao.getTableData();
-
+        //Connect to db;
+        Session session = HibernateUtil.getSession();
+        session.close();
     }
 
     public static Master getInstance() {

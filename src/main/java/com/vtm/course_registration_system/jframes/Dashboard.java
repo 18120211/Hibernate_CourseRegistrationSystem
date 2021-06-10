@@ -5,7 +5,9 @@
  */
 package com.vtm.course_registration_system.jframes;
 
-import com.vtm.course_registration_system.daos.MinistryDao;
+import com.sun.tools.javac.jvm.Code;
+import com.vtm.course_registration_system.configs.Local;
+import com.vtm.course_registration_system.daos.*;
 import com.vtm.course_registration_system.models.*;
 
 import javax.swing.*;
@@ -14,6 +16,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Date;
 
 /**
  * @author minht
@@ -47,6 +50,7 @@ public class Dashboard extends javax.swing.JFrame {
     public static Object[][] listClass;
     public StudentEntity curStudent;
     public static Object[][] listStudent;
+    public CourseregistrationsessionEntity curSession;
     public static Object[][] listSession;
     public CourseEntity curCourse;
     public static Object[][] listCourse;
@@ -126,7 +130,7 @@ public class Dashboard extends javax.swing.JFrame {
         this.minUpBtn.addMouseListener(new editBtnListener(this.minUpPanel, Dashboard.ministry));
         this.minAddCancelBtn.addMouseListener(new editBtnListener(this.minCancelPanel, Dashboard.ministry));
         this.minUpCancelBtn.addMouseListener(new editBtnListener(this.minCancelPanel, Dashboard.ministry));
-        this.minSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.ministry));
+        this.minSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.ministry, this.minInforPanel));
 
         this.minAddConf.addMouseListener(new UpdateDataListener(Dashboard.ministry, Dashboard.add));
         this.minUpConf.addMouseListener(new UpdateDataListener(Dashboard.ministry, Dashboard.update));
@@ -138,7 +142,7 @@ public class Dashboard extends javax.swing.JFrame {
         this.subUpBtn.addMouseListener(new editBtnListener(this.subUpPanel, Dashboard.subject));
         this.subAddCancelBtn.addMouseListener(new editBtnListener(this.subCancelPanel, Dashboard.subject));
         this.subUpCancelBtn.addMouseListener(new editBtnListener(this.subCancelPanel, Dashboard.subject));
-        this.subSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.subject));
+        this.subSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.subject, this.subInforPanel));
 
         this.subAddConf.addMouseListener(new UpdateDataListener(Dashboard.subject, Dashboard.add));
         this.subUpConf.addMouseListener(new UpdateDataListener(Dashboard.subject, Dashboard.update));
@@ -147,7 +151,7 @@ public class Dashboard extends javax.swing.JFrame {
 //        Semester config
         this.semAddBtn.addMouseListener(new editBtnListener(this.semAddPanel, Dashboard.semester));
         this.semAddCancelBtn.addMouseListener(new editBtnListener(this.semCancelPanel, Dashboard.semester));
-        this.semSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.semester));
+        this.semSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.semester, this.semInforPanel));
 
         this.semAddConf.addMouseListener(new UpdateDataListener(Dashboard.semester, Dashboard.add));
         this.semDelConf.addMouseListener(new UpdateDataListener(Dashboard.semester, Dashboard.delete, "Xác nhận", "Xóa học kỳ"));
@@ -156,7 +160,7 @@ public class Dashboard extends javax.swing.JFrame {
 //        Class config
         this.classAddBtn.addMouseListener(new editBtnListener(this.classAddPanel, Dashboard.classs));
         this.classAddCancelBtn.addMouseListener(new editBtnListener(this.classCancelPanel, Dashboard.classs));
-        this.classSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.classs));
+        this.classSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.classs, this.classInforPanel));
 
         this.classAddConf.addMouseListener(new UpdateDataListener(Dashboard.classs, Dashboard.add));
         this.classDelConf.addMouseListener(new UpdateDataListener(Dashboard.classs, Dashboard.delete, "Xác nhận", "Xóa lớp học"));
@@ -166,7 +170,7 @@ public class Dashboard extends javax.swing.JFrame {
         this.stuUpBtn.addMouseListener(new editBtnListener(this.stuUpPanel, Dashboard.student));
         this.stuAddCancelBtn.addMouseListener(new editBtnListener(this.stuCancelPanel, Dashboard.student));
         this.stuUpCancelBtn.addMouseListener(new editBtnListener(this.stuCancelPanel, Dashboard.student));
-        this.stuSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.student));
+        this.stuSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.student, this.stuInforPanel));
 
         this.stuAddConf.addMouseListener(new UpdateDataListener(Dashboard.student, Dashboard.add));
         this.stuUpConf.addMouseListener(new UpdateDataListener(Dashboard.student, Dashboard.update));
@@ -175,20 +179,20 @@ public class Dashboard extends javax.swing.JFrame {
 //        session config
         this.sesAddBtn.addMouseListener(new editBtnListener(this.sesAddPanel, Dashboard.session));
         this.sesAddCancelBtn.addMouseListener(new editBtnListener(this.sesCancelPanel, Dashboard.session));
-        this.sesSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.session));
+        this.sesSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.session, this.sesInforPanel));
 
         this.sesAddConf.addMouseListener(new UpdateDataListener(Dashboard.session, Dashboard.add));
 
 //        Course config
         this.couAddBtn.addMouseListener(new editBtnListener(this.couAddPanel, Dashboard.course));
         this.couAddCancelBtn.addMouseListener(new editBtnListener(this.couCancelPanel, Dashboard.course));
-        this.couSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.course));
+        this.couSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.course, this.couInforPanel));
 
         this.couAddConf.addMouseListener(new UpdateDataListener(Dashboard.course, Dashboard.add));
         this.couDelConf.addMouseListener(new UpdateDataListener(Dashboard.course, Dashboard.delete, "Xác nhận", "Xóa học phần"));
 
 //        Registration config
-        this.regSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.registration));
+        this.regSearchBtn.addMouseListener(new SearchBtnListener(Dashboard.registration, this.regScrollPane));
 
     }
 
@@ -208,110 +212,346 @@ public class Dashboard extends javax.swing.JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             super.mouseClicked(e); //To change body of generated methods, choose Tools | Templates.
-            JOptionPane.showMessageDialog(null, "Set học kỳ hiện tại thành công");
+            Local.currentSemester = Dashboard.this.curSemester;
+            if (SemesterDao.get(Dashboard.this.curSemester.getId()) == null) {
+                JOptionPane.showMessageDialog(null, "Set học kỳ thất bại",
+                        "Set học kỳ thất bại", JOptionPane.ERROR_MESSAGE);
+            }
+            if(Local.updateCurrentSemester()) {
+                JOptionPane.showMessageDialog(null, "Set học kỳ hiện tại thành công");
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Set học kỳ thất bại",
+                        "Set học kỳ thất bại", JOptionPane.ERROR_MESSAGE);
+            }
         }
 
     }
 
     void updateData(int entityType, int editType) {
-        if (entityType == Dashboard.ministry) {
-            if (editType == Dashboard.add) {
-                JOptionPane.showMessageDialog(null, "Thêm thành công");
-            } else if (editType == Dashboard.update) {
-                JOptionPane.showMessageDialog(null, "Cập nhật thành công");
-            } else if (editType == Dashboard.delete) {
-                JOptionPane.showMessageDialog(null, "Xóa thành công");
-            } else if (editType == Dashboard.reset) {
-                JOptionPane.showMessageDialog(null, "Reset thành công");
-            }
-            Dashboard.listMinitry = MinistryDao.getTableData();
-            this.minTable.setModel(new DefaultTableModel(Dashboard.listMinitry,
-                    new String[]{
-                            "ID", "Họ tên", "Tài khoản", "Mật khẩu"
-                    }));
-            this.minScrollPane.setViewportView(minTable);
-        } else if (entityType == Dashboard.subject) {
-            if (editType == Dashboard.add) {
-                JOptionPane.showMessageDialog(null, "Thêm thành công");
-            } else if (editType == Dashboard.update) {
-                JOptionPane.showMessageDialog(null, "Cập nhật thành công");
-            } else if (editType == Dashboard.delete) {
-                JOptionPane.showMessageDialog(null, "Xóa thành công");
-            }
-//            Dashboard.listSubject = SubjectDao.
-            subTable.setModel(new javax.swing.table.DefaultTableModel(
-                    Dashboard.listSubject,
-                    new String[]{
-                            "ID", "Tên môn", "Mã môn", "Số tin chỉ"
+        boolean isValid = false;
+        try {
+            if (entityType == Dashboard.ministry) {
+                if (editType == Dashboard.add) {
+                    String newUser = this.minAddUserField.getText();
+                    String newPass = this.minAddPassField.getText();
+                    String newName = this.minAddNameField.getText();
+                    if (!newUser.isEmpty() && !newPass.isEmpty() && !newName.isEmpty()) {
+                        isValid = true;
+                        MinistryDao.add(new MinistryEntity(newUser, newPass, newName));
+                        this.minInforPanel.setVisible(false);
+                        this.minCancelPanel.setVisible(true);
+                        JOptionPane.showMessageDialog(null, "Thêm thành công");
                     }
-            ));
-            subScrollPane.setViewportView(subTable);
-        } else if (entityType == Dashboard.semester) {
-            if (editType == Dashboard.add) {
-                JOptionPane.showMessageDialog(null, "Thêm thành công");
-            } else if (editType == Dashboard.delete) {
-                JOptionPane.showMessageDialog(null, "Xóa thành công");
+
+                } else if (editType == Dashboard.update) {
+                    String newUser = this.minUpNameField.getText();
+                    String newPass = this.minUpPassField.getText();
+                    if (!newUser.isEmpty() && !newPass.isEmpty()) {
+                        isValid = true;
+                        this.curMinistry.setName(newUser);
+                        this.curMinistry.setPassword(newPass);
+                        MinistryDao.update(this.curMinistry);
+                        this.minInforPanel.setVisible(false);
+                        this.minCancelPanel.setVisible(true);
+                        JOptionPane.showMessageDialog(null, "Cập nhật thành công");
+                    }
+                } else if (editType == Dashboard.delete) {
+                    isValid = true;
+                    MinistryDao.delete(this.curMinistry.getId());
+                    this.minInforPanel.setVisible(false);
+                    this.minCancelPanel.setVisible(true);
+                    JOptionPane.showMessageDialog(null, "Xóa thành công");
+                } else if (editType == Dashboard.reset) {
+                    isValid = true;
+                    this.curMinistry.setPassword("");
+                    MinistryDao.update(this.curMinistry);
+                    JOptionPane.showMessageDialog(null, "Reset thành công");
+                }
+                Dashboard.listMinitry = MinistryDao.getTableData();
+                this.minTable.setModel(new DefaultTableModel(
+                        Dashboard.listMinitry,
+                        new String[]{
+                                "ID", "Họ tên", "Tài khoản", "Mật khẩu"
+                        }));
+                this.minScrollPane.setViewportView(minTable);
+            } else if (entityType == Dashboard.subject) {
+                if (editType == Dashboard.add) {
+                    String newCode = this.subAddCodeField.getText();
+                    String newName = this.subAddNameField.getText();
+                    String newCredit = this.subAddCreditField.getText();
+                    if(!newName.isEmpty() && !newCode.isEmpty() && !newCredit.isEmpty()) {
+                        isValid = true;
+                        SubjectDao.add(new SubjectEntity(newCode, newName, Integer.parseInt(newCredit)));
+                        this.subInforPanel.setVisible(false);
+                        this.subCancelPanel.setVisible(true);
+                        JOptionPane.showMessageDialog(null, "Thêm thành công");
+                    }
+                } else if (editType == Dashboard.update) {
+                    String newCode = this.subUpCodeField.getText();
+                    String newName = this.subUpNameField.getText();
+                    String newCredit = this.subUpCreditField.getText();
+                    if(!newName.isEmpty() && !newCode.isEmpty() && !newCredit.isEmpty()) {
+                        isValid = true;
+                        this.curSubject.setCode(newCode);
+                        this.curSubject.setName(newName);
+                        this.curSubject.setNumcredit(Integer.parseInt(newCredit));
+                        SubjectDao.update(this.curSubject);
+                        this.subInforPanel.setVisible(false);
+                        this.subCancelPanel.setVisible(true);
+                        JOptionPane.showMessageDialog(null, "Câp nhật thành công");
+                    }
+                } else if (editType == Dashboard.delete) {
+                    isValid = true;
+                    SubjectDao.delete(this.curSubject.getId());
+                    this.subInforPanel.setVisible(false);
+                    this.subCancelPanel.setVisible(true);
+                    JOptionPane.showMessageDialog(null, "Xóa thành công");
+                }
+                Dashboard.listSubject = SubjectDao.getTableData();
+                subTable.setModel(new javax.swing.table.DefaultTableModel(
+                        Dashboard.listSubject,
+                        new String[]{
+                                "ID", "Tên môn", "Mã môn", "Số tin chỉ"
+                        }
+                ));
+                subScrollPane.setViewportView(subTable);
+            } else if (entityType == Dashboard.semester) {
+                if (editType == Dashboard.add) {
+                    String newName = this.semAddNameField.getText();
+                    String newYear = this.semAddYearField.getText();
+                    String newStart = this.semAddStartField.getText();
+                    String newEnd = this.semAddEndField.getText();
+                    if (!newName.isEmpty() && !newYear.isEmpty() && !newStart.isEmpty() && ! newEnd.isEmpty()) {
+                        isValid = true;
+                        SemesterDao.add(new SemesterEntity(newName, Integer.parseInt(newYear),
+                                Date.valueOf(newStart), Date.valueOf(newEnd)));
+                        this.semInforPanel.setVisible(false);
+                        this.semCancelPanel.setVisible(true);
+                        JOptionPane.showMessageDialog(null, "Thêm thành công");
+                    }
+                } else if (editType == Dashboard.delete) {
+                    isValid = true;
+                    SemesterDao.delete(this.curSemester.getId());
+                    this.semInforPanel.setVisible(false);
+                    this.semCancelPanel.setVisible(true);
+                    JOptionPane.showMessageDialog(null, "Xóa thành công");
+                }
+                Dashboard.listSemester = SemesterDao.getTableData();
+                this.semTable.setModel(new DefaultTableModel(
+                        Dashboard.listSemester,
+                        new String[] {
+                                "ID", "Tên học kỳ", "Năm học", "Ngày bắt đầu", "Ngày kết thúc"
+                        }
+                ));
+            } else if (entityType == Dashboard.classs) {
+                if (editType == Dashboard.add) {
+                    JOptionPane.showMessageDialog(null, "Thêm thành công");
+                } else if (editType == Dashboard.delete) {
+                    JOptionPane.showMessageDialog(null, "Xóa thành công");
+                }
+                Dashboard.listClass = ClassDao.getTableData();
+                this.classTable.setModel(new DefaultTableModel(
+                        Dashboard.listClass,
+                        new String[] {
+                                "ID", "Tên lớp", "Số bạn nam", "Số bạn nữ"
+                        }
+                ));
+            } else if (entityType == Dashboard.student) {
+                if (editType == Dashboard.add) {
+                    JOptionPane.showMessageDialog(null, "Thêm thành công");
+                } else if (editType == Dashboard.update) {
+                    JOptionPane.showMessageDialog(null, "Cập nhật thành công");
+                } else if (editType == Dashboard.reset) {
+                    JOptionPane.showMessageDialog(null, "Reset thành công");
+                }
+                Dashboard.listStudent = StudentDao.getTableData();
+                this.stuTable.setModel(new DefaultTableModel(
+                        Dashboard.listStudent,
+                        new String[] {
+                                "ID", "Họ tên", "MSSV", "Tài khoản", "Giới tính", "Ngày sinh", "Số môn đã đk", "Mã lớp"
+                        }
+                ));
+            } else if (entityType == Dashboard.session) {
+                if (editType == Dashboard.add) {
+                    JOptionPane.showMessageDialog(null, "Thêm thành công");
+                }
+                Dashboard.listSession = CourseregistrationsessionDao.getTableData();
+                this.sesTable.setModel(new DefaultTableModel(
+                        Dashboard.listSession,
+                        new String[] {
+                                "ID", "Ngày bắt đầu", "Ngày kết thúc", "Học kỳ"
+                        }
+                ));
+            } else if (entityType == Dashboard.course) {
+                if (editType == Dashboard.add) {
+                    JOptionPane.showMessageDialog(null, "Thêm thành công");
+                } else if (editType == Dashboard.delete) {
+                    JOptionPane.showMessageDialog(null, "Xóa thành công");
+                }
+                Dashboard.listCourse = CourseDao.getTableData();
+                this.couTable.setModel(new DefaultTableModel(
+                        Dashboard.listCourse,
+                        new String[]{
+                                "ID", "Mã môn", "Tên môn", "Số tín chỉ", "Giáo viên", "Phòng", "Thứ", "Ca"
+                        }
+                ));
             }
-        } else if (entityType == Dashboard.classs) {
-            if (editType == Dashboard.add) {
-                JOptionPane.showMessageDialog(null, "Thêm thành công");
-            } else if (editType == Dashboard.delete) {
-                JOptionPane.showMessageDialog(null, "Xóa thành công");
+            if (isValid == false) {
+                JOptionPane.showMessageDialog(null, "Không để khoảng trắng",
+                        "Nhập sai", JOptionPane.ERROR_MESSAGE);
             }
-        } else if (entityType == Dashboard.student) {
-            if (editType == Dashboard.add) {
-                JOptionPane.showMessageDialog(null, "Thêm thành công");
-            } else if (editType == Dashboard.update) {
-                JOptionPane.showMessageDialog(null, "Cập nhật thành công");
-            } else if (editType == Dashboard.reset) {
-                JOptionPane.showMessageDialog(null, "Reset thành công");
-            }
-        } else if (entityType == Dashboard.session) {
-            if (editType == Dashboard.add) {
-                JOptionPane.showMessageDialog(null, "Thêm thành công");
-            }
-        } else if (entityType == Dashboard.course) {
-            if (editType == Dashboard.add) {
-                JOptionPane.showMessageDialog(null, "Thêm thành công");
-            } else if (editType == Dashboard.delete) {
-                JOptionPane.showMessageDialog(null, "Xóa thành công");
-            }
+        }
+        catch(NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Vui lòng nhập hợp lệ",
+                    "Nhập sai", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
+
+    class UpdateDataThread extends Thread {
+        private int entityType;
+        private int editType;
+        private Dashboard dashboard = Dashboard.this;
+        public UpdateDataThread(int entityType, int editType) {
+            this.entityType = entityType;
+            this.editType = editType;
+        }
+        @Override
+        public void run() {
+            super.run();
+
         }
     }
 
     class SearchBtnListener extends MouseAdapter {
 
         private int entityType;
+        private JPanel inforPanel;
+        private JScrollPane scrollPane;
         private Dashboard dashboard = Dashboard.this;
 
-        public SearchBtnListener(int entityType) {
+        public SearchBtnListener(int entityType, JPanel inforPanel) {
             this.entityType = entityType;
+            this.inforPanel = inforPanel;
+        }
+        public SearchBtnListener(int entityType, JScrollPane scrollPane) {
+            this.entityType = entityType;
+            this.scrollPane = scrollPane;
         }
 
         @Override
         public void mouseClicked(MouseEvent e) {
             super.mouseClicked(e); //To change body of generated methods, choose Tools | Templates.
             try {
-                int id = Integer.parseInt(dashboard.minSearchField.getText());
+                boolean isExistEntity = false;
                 if (this.entityType == Dashboard.ministry) {
-                    dashboard.minInforPanel.setVisible(true);
+                    int id = Integer.parseInt(dashboard.minSearchField.getText());
+                    this.dashboard.curMinistry = MinistryDao.get(id);
+                    if(this.dashboard.curMinistry != null) {
+                        isExistEntity = true;
+                        this.dashboard.minName.setText(this.dashboard.curMinistry.getName());
+                        this.dashboard.minId.setText(Integer.toString(this.dashboard.curMinistry.getId()));
+                        this.dashboard.minUser.setText(this.dashboard.curMinistry.getUsername());
+                        this.dashboard.minPass.setText(this.dashboard.curMinistry.getPassword());
+                    }
                 } else if (this.entityType == Dashboard.subject) {
-                    dashboard.subInforPanel.setVisible(true);
+                    int id = Integer.parseInt(this.dashboard.subSearchField.getText());
+                    this.dashboard.curSubject = SubjectDao.get(id);
+                    if (this.dashboard.curSubject != null) {
+                        isExistEntity = true;
+                        this.dashboard.subName.setText(this.dashboard.curSubject.getName());
+                        this.dashboard.subId.setText(Integer.toString(this.dashboard.curSubject.getId()));
+                        this.dashboard.subCode.setText(this.dashboard.curSubject.getCode());
+                        this.dashboard.subCredit.setText(Integer.toString(this.dashboard.curSubject.getNumcredit()));
+                    }
                 } else if (this.entityType == Dashboard.semester) {
-                    dashboard.semInforPanel.setVisible(true);
+                    int id = Integer.parseInt(this.dashboard.semSearchField.getText());
+                    this.dashboard.curSemester = SemesterDao.get(id);
+                    if (this.dashboard.curSemester != null) {
+                        isExistEntity = true;
+                        this.dashboard.semName.setText(this.dashboard.curSemester.getName());
+                        this.dashboard.semYear.setText(Integer.toString(this.dashboard.curSemester.getYear()));
+                        this.dashboard.semStart.setText(this.dashboard.curSemester.getStartdate().toString());
+                        this.dashboard.semEnd.setText(this.dashboard.curSemester.getEnddate().toString());
+                    }
                 } else if (this.entityType == Dashboard.classs) {
-                    dashboard.classInforPanel.setVisible(true);
+                    int id = Integer.parseInt(this.dashboard.classSearchField.getText());
+                    this.dashboard.curClass = ClassDao.get(id);
+                    if (this.dashboard.curClass != null) {
+                        isExistEntity = true;
+                        this.dashboard.className.setText(this.dashboard.curClass.getName());
+                        this.dashboard.classId.setText(Integer.toString(this.dashboard.curClass.getId()));
+                        this.dashboard.classNummale.setText(Integer.toString(this.dashboard.curClass.getNummale()));
+                        this.dashboard.classNumfemale.setText(Integer.toString(this.dashboard.curClass.getNumfemale()));
+                    }
                 } else if (this.entityType == Dashboard.student) {
-                    dashboard.stuInforPanel.setVisible(true);
+                    int id = Integer.parseInt(this.dashboard.stuSearchField.getText());
+                    this.dashboard.curStudent = StudentDao.get(id);
+                    if (this.dashboard.curStudent != null) {
+                        isExistEntity = true;
+                        this.dashboard.stuName.setText(this.dashboard.curStudent.getName());
+                        this.dashboard.stuMssv.setText(this.dashboard.curStudent.getCode());
+                        this.dashboard.stuSex.setText(this.dashboard.curStudent.getSex());
+                        this.dashboard.stuBirth.setText(this.dashboard.curStudent.getBirth().toString());
+                        this.dashboard.stuNumsubject.setText(Integer.toString(this.dashboard.curStudent.getNumsubject()));
+                        this.dashboard.stuClass.setText(this.dashboard.curStudent.getClassByIdcl().getName());
+                    }
                 } else if (this.entityType == Dashboard.session) {
-                    dashboard.sesInforPanel.setVisible(true);
+                    int id = Integer.parseInt(this.dashboard.sesSearchField.getText());
+                    this.dashboard.curSession = CourseregistrationsessionDao.get(id);
+                    if (this.dashboard.curSession != null) {
+                        isExistEntity = true;
+                        this.dashboard.sesId.setText(Integer.toString(this.dashboard.curSession.getId()));
+                        this.dashboard.sesStart.setText(this.dashboard.curSession.getStartdate().toString());
+                        this.dashboard.sesEnd.setText(this.dashboard.curSession.getEnddate().toString());
+                        this.dashboard.sesSemester.setText(this.dashboard.curSession.getSemesterByIdse().getName());
+                    }
                 } else if (this.entityType == Dashboard.course) {
-                    dashboard.couInforPanel.setVisible(true);
+                    int id = Integer.parseInt(this.dashboard.couSearchField.getText());
+                    this.dashboard.curCourse = CourseDao.get(id);
+                    if (this.dashboard.curCourse != null) {
+                        isExistEntity = true;
+                        this.dashboard.couId.setText(Integer.toString(this.dashboard.curCourse.getId()));
+                        this.dashboard.couName.setText(this.dashboard.curCourse.getName());
+                        this.dashboard.couYear.setText(Integer.toString(this.dashboard.curCourse.getYear()));
+                        this.dashboard.couTeacher.setText(this.dashboard.curCourse.getTeacher());
+                        this.dashboard.couRoom.setText(this.dashboard.curCourse.getRoom());
+                        this.dashboard.couDay.setText(this.dashboard.curCourse.getDay());
+                        this.dashboard.couShift.setText(Integer.toString(this.dashboard.curCourse.getShift()));
+                        this.dashboard.couSubject.setText(this.dashboard.curCourse.getSubjectByIdsu().getName());
+                        this.dashboard.couMinistry.setText(this.dashboard.curCourse.getMinistryByIdmi().getName());
+                    }
                 } else if (this.entityType == Dashboard.registration) {
-                    dashboard.regScrollPane.setVisible(true);
+                    int id = Integer.parseInt(this.dashboard.regSearchField.getText());
+                    this.dashboard.curCourse = CourseDao.get(id);
+                    if (this.dashboard.curCourse != null) {
+                        isExistEntity = true;
+                        Object[][] tableData = CourseregistrationDao.getTableData(this.dashboard.curCourse.getId());
+                        this.dashboard.regTable.setModel(new DefaultTableModel(
+                                tableData,
+                                new String[] {
+                                        "Mssv", "Họ tên", "Mã môn", "Tên môn", "Giáo viên", "Ca học", "Thời điểm đăng ký"
+                                }
+                        ));
+                    }
+                }
+                if (isExistEntity) {
+                    if (this.entityType == Dashboard.registration) {
+                        this.scrollPane.setVisible(true);
+                    }
+                    else {
+                        this.inforPanel.setVisible(true);
+                    }
+                }
+                else {
+                    JOptionPane.showMessageDialog(null,"Không tìm thấy", "Không tìm thấy",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
-            catch (Exception ex) {
+            catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Vui lòng nhập ID hợp lệ", "Nhập sai",
+                        JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         }
@@ -530,7 +770,7 @@ public class Dashboard extends javax.swing.JFrame {
         minNameLabel4 = new javax.swing.JLabel();
         subUpNameField = new javax.swing.JTextField();
         minPassLabel4 = new javax.swing.JLabel();
-        subUpPassField = new javax.swing.JTextField();
+        subUpCodeField = new javax.swing.JTextField();
         subUpConf = new javax.swing.JButton();
         subUpCancelBtn = new javax.swing.JButton();
         minPassLabel6 = new javax.swing.JLabel();
@@ -554,13 +794,13 @@ public class Dashboard extends javax.swing.JFrame {
         semInforPanel = new javax.swing.JPanel();
         minInforLabel8 = new javax.swing.JLabel();
         minNameLabel6 = new javax.swing.JLabel();
-        minName1 = new javax.swing.JLabel();
+        semName = new javax.swing.JLabel();
         minIdLabel2 = new javax.swing.JLabel();
-        minId1 = new javax.swing.JLabel();
+        semYear = new javax.swing.JLabel();
         minUserLabel4 = new javax.swing.JLabel();
-        minUser1 = new javax.swing.JLabel();
+        semStart = new javax.swing.JLabel();
         minPassLabel7 = new javax.swing.JLabel();
-        minPass1 = new javax.swing.JLabel();
+        semEnd = new javax.swing.JLabel();
         semAddBtn = new javax.swing.JButton();
         semDelConf = new javax.swing.JButton();
         semSetConf = new javax.swing.JButton();
@@ -715,9 +955,9 @@ public class Dashboard extends javax.swing.JFrame {
         minPassLabel29 = new javax.swing.JLabel();
         couShift = new javax.swing.JLabel();
         minPassLabel30 = new javax.swing.JLabel();
-        couIdsubject = new javax.swing.JLabel();
+        couSubject = new javax.swing.JLabel();
         minPassLabel31 = new javax.swing.JLabel();
-        couIdministry = new javax.swing.JLabel();
+        couMinistry = new javax.swing.JLabel();
         couEditPanel = new javax.swing.JPanel();
         couCancelPanel = new javax.swing.JPanel();
         couAddPanel = new javax.swing.JPanel();
@@ -1059,13 +1299,7 @@ public class Dashboard extends javax.swing.JFrame {
 
         // Cho phep table sap xep
         minTable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {2, "Võ Thế Hùng", "ministry2", "ministry2"},
-                        {2, 2, 3, 4},
-                        {3, 2, 3, 4},
-                        {6, 2, 3, 4},
-                        {1, 2, 3, 4},
-                },
+                Dashboard.listMinitry,
                 new String[]{
                         "ID", "Họ tên", "Tài khoản", "Mật khẩu"
                 }
@@ -1207,13 +1441,13 @@ public class Dashboard extends javax.swing.JFrame {
         minNameLabel2.setText("Họ tên:");
 
         minUpNameField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        minUpNameField.setText("Võ Thế Hùng");
+        minUpNameField.setText("");
 
         minPassLabel2.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel2.setText("Mật khẩu:");
 
         minUpPassField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        minUpPassField.setText("ministry2");
+        minUpPassField.setText("");
 
         minUpConf.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         minUpConf.setText("Xác nhận");
@@ -1403,13 +1637,7 @@ public class Dashboard extends javax.swing.JFrame {
 
         // Cho phep table sap xep
         subTable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {2, "Võ Thế Hùng", "ministry2", "ministry2"},
-                        {2, 2, 3, 4},
-                        {3, 2, 3, 4},
-                        {6, 2, 3, 4},
-                        {1, 2, 3, 4},
-                },
+                Dashboard.listSubject,
                 new String[]{
                         "ID", "Tên môn", "Mã môn", "Số tin chỉ"
                 }
@@ -1543,13 +1771,13 @@ public class Dashboard extends javax.swing.JFrame {
         minNameLabel4.setText("Tên môn:");
 
         subUpNameField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        subUpNameField.setText("Võ Thế Hùng");
+        subUpNameField.setText("");
 
         minPassLabel4.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel4.setText("Mã môn");
 
-        subUpPassField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        subUpPassField.setText("ministry2");
+        subUpCodeField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        subUpCodeField.setText("");
 
         subUpConf.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         subUpConf.setText("Xác nhận");
@@ -1561,7 +1789,7 @@ public class Dashboard extends javax.swing.JFrame {
         minPassLabel6.setText("Số tín chỉ");
 
         subUpCreditField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        subUpCreditField.setText("ministry2");
+        subUpCreditField.setText("");
         subUpCreditField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 subUpCreditFieldActionPerformed(evt);
@@ -1589,7 +1817,7 @@ public class Dashboard extends javax.swing.JFrame {
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(subUpPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                                         .addComponent(subUpNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                                                        .addComponent(subUpPassField)))
+                                                        .addComponent(subUpCodeField)))
                                         .addGroup(subUpPanelLayout.createSequentialGroup()
                                                 .addComponent(subUpConf, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(18, 18, 18)
@@ -1607,7 +1835,7 @@ public class Dashboard extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(subUpPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel4)
-                                        .addComponent(subUpPassField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(subUpCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(subUpPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel6)
@@ -1773,26 +2001,26 @@ public class Dashboard extends javax.swing.JFrame {
         minNameLabel6.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minNameLabel6.setText("Tên học kỳ:");
 
-        minName1.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        minName1.setText("hk");
+        semName.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        semName.setText("hk");
 
         minIdLabel2.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minIdLabel2.setText("Năm học:");
 
-        minId1.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        minId1.setText("200");
+        semYear.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        semYear.setText("200");
 
         minUserLabel4.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minUserLabel4.setText("Ngày bắt đầu:");
 
-        minUser1.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        minUser1.setText("2021-10-1");
+        semStart.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        semStart.setText("2021-10-1");
 
         minPassLabel7.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel7.setText("Ngày kết thúc:");
 
-        minPass1.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        minPass1.setText("2021-1-1");
+        semEnd.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        semEnd.setText("2021-1-1");
 
         semAddBtn.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         semAddBtn.setText("Thêm học kỳ");
@@ -1822,10 +2050,10 @@ public class Dashboard extends javax.swing.JFrame {
                                                                 .addComponent(minIdLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addGroup(semInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                                .addComponent(minPass1, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
-                                                                .addComponent(minName1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                                .addComponent(minId1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                                .addComponent(minUser1, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)))
+                                                                .addComponent(semEnd, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+                                                                .addComponent(semName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(semYear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(semStart, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)))
                                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, semInforPanelLayout.createSequentialGroup()
                                                         .addGap(33, 33, 33)
                                                         .addGroup(semInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1844,19 +2072,19 @@ public class Dashboard extends javax.swing.JFrame {
                                 .addGap(6, 6, 6)
                                 .addGroup(semInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minNameLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(minName1))
+                                        .addComponent(semName))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(semInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minIdLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(minId1))
+                                        .addComponent(semYear))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(semInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minUserLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(minUser1))
+                                        .addComponent(semStart))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(semInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel7)
-                                        .addComponent(minPass1))
+                                        .addComponent(semEnd))
                                 .addGap(33, 33, 33)
                                 .addGroup(semInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(semAddBtn)
@@ -2419,13 +2647,13 @@ public class Dashboard extends javax.swing.JFrame {
         minNameLabel11.setText("Họ tên:");
 
         stuUpNameField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        stuUpNameField.setText("Võ Thế Minh");
+        stuUpNameField.setText("");
 
         minPassLabel12.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel12.setText("Mssv:");
 
         stuUpCodeField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        stuUpCodeField.setText("18120211");
+        stuUpCodeField.setText("");
 
         stuUpConf.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         stuUpConf.setText("Xác nhận");
@@ -2437,13 +2665,13 @@ public class Dashboard extends javax.swing.JFrame {
         minPassLabel17.setText("Giới tính:");
 
         stuUpSexField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        stuUpSexField.setText("Nam");
+        stuUpSexField.setText("");
 
         minPassLabel18.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel18.setText("Sinh nhật:");
 
         stuUpBirthField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        stuUpBirthField.setText("18120211");
+        stuUpBirthField.setText("");
         stuUpBirthField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 stuUpBirthFieldActionPerformed(evt);
@@ -2454,7 +2682,7 @@ public class Dashboard extends javax.swing.JFrame {
         minPassLabel19.setText("Lớp:");
 
         stuUpClassField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        stuUpClassField.setText("ID");
+        stuUpClassField.setText("");
 
         javax.swing.GroupLayout stuUpPanelLayout = new javax.swing.GroupLayout(stuUpPanel);
         stuUpPanel.setLayout(stuUpPanelLayout);
@@ -2527,7 +2755,7 @@ public class Dashboard extends javax.swing.JFrame {
         stuEditPanel.add(stuUpPanel);
 
         minInforLabel16.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        minInforLabel16.setText("Thêm tài khoản giáo vụ");
+        minInforLabel16.setText("Thêm tài khoản học sinh");
 
         minNameLabel12.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minNameLabel12.setText("Họ tên:");
@@ -2539,13 +2767,13 @@ public class Dashboard extends javax.swing.JFrame {
         minPassLabel13.setText("Mật khẩu:");
 
         stuAddNameField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        stuAddNameField.setText("hoten");
+        stuAddNameField.setText("");
 
         stuAddUserField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        stuAddUserField.setText("taikhoan");
+        stuAddUserField.setText("");
 
         stuAddPassField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        stuAddPassField.setText("matkhau");
+        stuAddPassField.setText("");
 
         stuAddConf.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         stuAddConf.setText("Xác nhận");
@@ -2563,7 +2791,7 @@ public class Dashboard extends javax.swing.JFrame {
         minPassLabel21.setText("Giới tính:");
 
         stuAddSexField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        stuAddSexField.setText("Nam");
+        stuAddSexField.setText("");
 
         minPassLabel22.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel22.setText("Sinh nhật:");
@@ -2575,7 +2803,7 @@ public class Dashboard extends javax.swing.JFrame {
         minPassLabel23.setText("Lớp:");
 
         stuAddClassField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        stuAddClassField.setText("ID");
+        stuAddClassField.setText("");
 
         javax.swing.GroupLayout stuAddPanelLayout = new javax.swing.GroupLayout(stuAddPanel);
         stuAddPanel.setLayout(stuAddPanelLayout);
@@ -2753,7 +2981,7 @@ public class Dashboard extends javax.swing.JFrame {
         sesSemester.setText("2021-10-1");
 
         sesAddBtn.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        sesAddBtn.setText("Thêm lớp học");
+        sesAddBtn.setText("Thêm kỳ đăng ký học phần");
 
         javax.swing.GroupLayout sesInforPanelLayout = new javax.swing.GroupLayout(sesInforPanel);
         sesInforPanel.setLayout(sesInforPanelLayout);
@@ -2824,7 +3052,7 @@ public class Dashboard extends javax.swing.JFrame {
         sesEditPanel.add(sesCancelPanel);
 
         minInforLabel19.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        minInforLabel19.setText("Thêm lớp học");
+        minInforLabel19.setText("Thêm kỳ học phần");
 
         minNameLabel14.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minNameLabel14.setText("ID học kỳ");
@@ -3025,14 +3253,14 @@ public class Dashboard extends javax.swing.JFrame {
         minPassLabel30.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel30.setText("Môn học:");
 
-        couIdsubject.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couIdsubject.setText("id môn học");
+        couSubject.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        couSubject.setText("id môn học");
 
         minPassLabel31.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel31.setText("Giáo vụ:");
 
-        couIdministry.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couIdministry.setText("id giáo vụ");
+        couMinistry.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        couMinistry.setText("id giáo vụ");
 
         javax.swing.GroupLayout couInforPanelLayout = new javax.swing.GroupLayout(couInforPanel);
         couInforPanel.setLayout(couInforPanelLayout);
@@ -3064,8 +3292,8 @@ public class Dashboard extends javax.swing.JFrame {
                                                                         .addComponent(couRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                                         .addComponent(couDay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                                         .addComponent(couShift, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                                        .addComponent(couIdsubject, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                                        .addComponent(couIdministry, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                                        .addComponent(couSubject, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                        .addComponent(couMinistry, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                                         .addGroup(couInforPanelLayout.createSequentialGroup()
                                                                 .addComponent(couAddBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addGap(42, 42, 42)
@@ -3107,10 +3335,10 @@ public class Dashboard extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel30)
-                                        .addComponent(couIdsubject))
+                                        .addComponent(couSubject))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(couIdministry)
+                                        .addComponent(couMinistry)
                                         .addComponent(minPassLabel31))
                                 .addGap(18, 18, 18)
                                 .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -3141,7 +3369,7 @@ public class Dashboard extends javax.swing.JFrame {
         minNameLabel18.setText("Tên học phần:");
 
         couAddNameField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        couAddNameField.setText("CTDL&GT 19CTT2");
+        couAddNameField.setText("");
 
         couAddConf.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         couAddConf.setText("Xác nhận");
@@ -3158,43 +3386,43 @@ public class Dashboard extends javax.swing.JFrame {
         minNameLabel19.setText("Năm:");
 
         couAddYearField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        couAddYearField.setText("2021");
+        couAddYearField.setText("");
 
         minNameLabel20.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minNameLabel20.setText("Giáo viên:");
 
         couAddTeacherField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        couAddTeacherField.setText("Phương Uyên");
+        couAddTeacherField.setText("");
 
         minNameLabel21.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minNameLabel21.setText("Phòng học:");
 
         couAddRoomField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        couAddRoomField.setText("F203");
+        couAddRoomField.setText("");
 
         minNameLabel22.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minNameLabel22.setText("Thứ:");
 
         couAddDayField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        couAddDayField.setText("Thứ 2");
+        couAddDayField.setText("");
 
         minNameLabel23.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minNameLabel23.setText("Ca:");
 
         couAddShiftField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        couAddShiftField.setText("3");
+        couAddShiftField.setText("");
 
         minNameLabel24.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minNameLabel24.setText("Id môn học:");
 
         couAddIdsubjectField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        couAddIdsubjectField.setText("1");
+        couAddIdsubjectField.setText("");
 
         minNameLabel25.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minNameLabel25.setText("Id kì đăng ký:");
 
         couAddIdsessionField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        couAddIdsessionField.setText("1");
+        couAddIdsessionField.setText("");
 
         javax.swing.GroupLayout couAddPanelLayout = new javax.swing.GroupLayout(couAddPanel);
         couAddPanel.setLayout(couAddPanelLayout);
@@ -3574,8 +3802,8 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JButton couDelConf;
     private javax.swing.JPanel couEditPanel;
     private javax.swing.JLabel couId;
-    private javax.swing.JLabel couIdministry;
-    private javax.swing.JLabel couIdsubject;
+    private javax.swing.JLabel couMinistry;
+    private javax.swing.JLabel couSubject;
     private javax.swing.JPanel couInforPanel;
     private javax.swing.JLabel couName;
     private javax.swing.JLabel couRoom;
@@ -3608,7 +3836,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JButton minDelConf;
     private javax.swing.JPanel minEditPanel;
     private javax.swing.JLabel minId;
-    private javax.swing.JLabel minId1;
+    private javax.swing.JLabel semYear;
     private javax.swing.JLabel minIdLabel;
     private javax.swing.JLabel minIdLabel1;
     private javax.swing.JLabel minIdLabel2;
@@ -3642,7 +3870,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel minInforLabel9;
     private javax.swing.JPanel minInforPanel;
     private javax.swing.JLabel minName;
-    private javax.swing.JLabel minName1;
+    private javax.swing.JLabel semName;
     private javax.swing.JLabel minNameLabel;
     private javax.swing.JLabel minNameLabel1;
     private javax.swing.JLabel minNameLabel10;
@@ -3669,7 +3897,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel minNameLabel8;
     private javax.swing.JLabel minNameLabel9;
     private javax.swing.JLabel minPass;
-    private javax.swing.JLabel minPass1;
+    private javax.swing.JLabel semEnd;
     private javax.swing.JLabel minPassLabel;
     private javax.swing.JLabel minPassLabel1;
     private javax.swing.JLabel minPassLabel10;
@@ -3714,7 +3942,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JPanel minUpPanel;
     private javax.swing.JTextField minUpPassField;
     private javax.swing.JLabel minUser;
-    private javax.swing.JLabel minUser1;
+    private javax.swing.JLabel semStart;
     private javax.swing.JLabel minUserLabel;
     private javax.swing.JLabel minUserLabel1;
     private javax.swing.JLabel minUserLabel10;
@@ -3844,7 +4072,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JTextField subUpCreditField;
     private javax.swing.JTextField subUpNameField;
     private javax.swing.JPanel subUpPanel;
-    private javax.swing.JTextField subUpPassField;
+    private javax.swing.JTextField subUpCodeField;
     private javax.swing.JPanel subjectContent;
     private javax.swing.JLabel subjectIcon;
     private javax.swing.JLabel subjectLabel;

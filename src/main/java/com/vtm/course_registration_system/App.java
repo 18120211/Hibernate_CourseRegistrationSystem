@@ -41,5 +41,6 @@ public class App {
 //        StudentDao.delete(4);
 
         Master.getInstance().run();
+
     }
 }

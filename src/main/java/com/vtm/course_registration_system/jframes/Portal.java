@@ -381,13 +381,7 @@ public class Portal extends javax.swing.JFrame {
 
         // Cho phep table sap xep
         registerTable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object [][] {
-                        {2, "Võ Thế Hùng", "ministry2", "ministry2"},
-                        {2, 2, 3, 4},
-                        {3, 2, 3, 4},
-                        {6, 2, 3, 4},
-                        {1, 2, 3, 4},
-                },
+                Portal.listRegister,
                 new String [] {
                         "ID", "Mã môn", "Tên môn", "Số tín chỉ", "Giáo viên", "Phòng", "Thứ", "Ca"
                 }
@@ -622,13 +616,7 @@ public class Portal extends javax.swing.JFrame {
 
         // Cho phep table sap xep
         couTable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object [][] {
-                        {2, "Võ Thế Hùng", "ministry2", "ministry2"},
-                        {2, 2, 3, 4},
-                        {3, 2, 3, 4},
-                        {6, 2, 3, 4},
-                        {1, 2, 3, 4},
-                },
+                Portal.listCourse,
                 new String [] {
                         "ID", "Mã môn", "Tên môn", "Số tín chỉ", "Giáo viên", "Phòng", "Thứ", "Ca"
                 }
