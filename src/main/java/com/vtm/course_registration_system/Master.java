@@ -8,6 +8,7 @@ import com.vtm.course_registration_system.jframes.Dashboard;
 import com.vtm.course_registration_system.jframes.Login;
 import com.vtm.course_registration_system.jframes.Portal;
 import com.vtm.course_registration_system.models.MinistryEntity;
+import com.vtm.course_registration_system.models.SemesterEntity;
 import com.vtm.course_registration_system.models.StudentEntity;
 import org.hibernate.Session;
 
@@ -17,9 +18,14 @@ public class Master {
     private static Master instance;
 
     private Master() {
-        //Connect to db;
-        Session session = HibernateUtil.getSession();
-        session.close();
+
+        Local.currentSemester = SemesterDao.get(1);
+        Local.updateCurrentSemester();
+        Local.readCurrentSemester();
+        System.out.println("HK hiện tại: " + Local.currentSemester.toString());
+//        Connect to db;
+//        Session session = HibernateUtil.getSession();
+//        session.close();
     }
 
     public static Master getInstance() {

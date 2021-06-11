@@ -101,4 +101,29 @@ public class SemesterEntity implements Serializable {
     public int hashCode() {
         return Objects.hash(id, name, year, startdate, enddate);
     }
+
+    public static Date getStart(String semName, int semYear) {
+        if (semName.equals("HK1")) {
+            return Date.valueOf(semYear+"-10-1");
+        }
+        else if (semName.equals("HK2")) {
+            return Date.valueOf(semYear+"-2-1");
+        }
+        else if (semName.equals("HK3")) {
+            return Date.valueOf(semYear + "-7-1");
+        }
+        return null;
+    }
+    public  static Date getEnd(String semName, int semYear) {
+        if (semName.equals("HK1")) {
+            return Date.valueOf(semYear+"-1-1");
+        }
+        else if (semName.equals("HK2")) {
+            return Date.valueOf(semYear+"-6-1");
+        }
+        else if (semName.equals("HK3")) {
+            return Date.valueOf(semYear + "-8-1");
+        }
+        return null;
+    }
 }

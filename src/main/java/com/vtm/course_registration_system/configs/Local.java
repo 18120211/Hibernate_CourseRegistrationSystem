@@ -5,6 +5,7 @@ import com.vtm.course_registration_system.enums.UserType;
 import com.vtm.course_registration_system.models.SemesterEntity;
 
 import java.io.*;
+import java.sql.Date;
 
 public class Local {
     public static int userID;
@@ -12,6 +13,7 @@ public class Local {
     public static Boolean isAuthenticated;
     public static Object user;
     public static SemesterEntity currentSemester;
+
 
     public static Boolean readCurrentSemester() {
         try {

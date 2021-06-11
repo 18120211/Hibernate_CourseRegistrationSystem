@@ -7,17 +7,15 @@ import com.vtm.course_registration_system.models.MinistryEntity;
 import com.vtm.course_registration_system.models.SemesterEntity;
 import com.vtm.course_registration_system.models.StudentEntity;
 
+import javax.sound.midi.Soundbank;
 import java.io.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class App {
-
-
     public static void main(String[] args) {
-        Local.readCurrentSemester();
-        System.out.println(Local.currentSemester);
+
 
 //        Timestamp registrationDate = new Timestamp(211, 8, 16, 10, 0, 0, 0);
 //        CourseregistrationEntity courseregistrationEntity = new CourseregistrationEntity(2,registrationDate

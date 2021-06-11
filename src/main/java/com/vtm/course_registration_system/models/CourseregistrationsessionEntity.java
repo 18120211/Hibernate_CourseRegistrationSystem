@@ -87,4 +87,11 @@ public class CourseregistrationsessionEntity {
         array[3] = this.semesterByIdse.getName();
         return array;
     }
+
+    public static boolean isValid(SemesterEntity semesterEntity, Date startDate, Date endDate) {
+        if (startDate.after(semesterEntity.getStartdate()) || endDate.after(semesterEntity.getStartdate())) {
+            return false;
+        }
+        return true;
+    }
 }
