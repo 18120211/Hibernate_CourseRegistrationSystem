@@ -1,14 +1,28 @@
 
 package com.vtm.course_registration_system.jframes;
 
-import com.vtm.course_registration_system.models.*;
+import com.vtm.course_registration_system.configs.Local;
+import com.vtm.course_registration_system.daos.CourseDao;
+import com.vtm.course_registration_system.daos.CourseregistrationDao;
+import com.vtm.course_registration_system.models.CourseEntity;
+import com.vtm.course_registration_system.models.CourseregistrationEntity;
+import com.vtm.course_registration_system.models.StudentEntity;
 
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 /**
  *
  * @author minht
@@ -20,11 +34,13 @@ public class Portal extends javax.swing.JFrame {
     final static int delete = 2;
     final static int reset = 3;
 
-    final static int signup = 5;
-    final static int course = 6;
+    final static int register = 5;
+    final static int cancel = 6;
 
-    public static Object[][] listCourse;
+    public static Object[][] listCancel;
     public static Object[][] listRegister;
+    public CourseEntity curCourseRegister;
+    public CourseEntity curCourseCancel;
 
     /**
      * Creates new form Portal
@@ -39,32 +55,32 @@ public class Portal extends javax.swing.JFrame {
         setResizable(false);
 
         this.registerInforPanel.setVisible(false);
-        this.couInforPanel.setVisible(false);
+        this.cancelInforPanel.setVisible(false);
 
-        this.courseContent.setVisible(false);
+        this.cancelContent.setVisible(false);
 
         addAction();
     }
 
     public void addAction() {
 //        Menuclick handle
-        this.courseTab.addMouseListener(new MenuClickHandle(this.courseTab, this.courseContent));
-        this.signupTab.addMouseListener(new MenuClickHandle(this.signupTab, this.registerContent));
+        this.cancelTab.addMouseListener(new MenuClickHandle(this.cancelTab, this.cancelContent));
+        this.registerTab.addMouseListener(new MenuClickHandle(this.registerTab, this.registerContent));
         this.logoutTab.addMouseListener(new LogoutListener());
 
-        this.courseLabel.addMouseListener(new MenuClickHandle(this.courseTab, this.courseContent));
-        this.signupLabel.addMouseListener(new MenuClickHandle(this.signupTab, this.registerContent));
+        this.cancelLabel.addMouseListener(new MenuClickHandle(this.cancelTab, this.cancelContent));
+        this.registerLabel.addMouseListener(new MenuClickHandle(this.registerTab, this.registerContent));
         this.logoutLabel.addMouseListener(new LogoutListener());
 
-//        Signup config
-        this.registerSearchBtn.addMouseListener(new SearchBtnListener(this.registerInforPanel, Portal.signup));
-        this.registerCancelBtn.addMouseListener(new SearchBtnListener(this.registerCancelPanel, Portal.signup));
-        this.registerAddConf.addMouseListener(new UpdateDataListener(Portal.signup, Portal.add));
+//        Register config
+        this.registerSearchBtn.addMouseListener(new SearchBtnListener(this.registerInforPanel, Portal.register));
+        this.registerCancelBtn.addMouseListener(new SearchBtnListener(this.registerCancelPanel, Portal.register));
+        this.registerAddConf.addMouseListener(new UpdateDataListener(Portal.register, Portal.add));
 
-//        Course config
-        this.couSearchBtn.addMouseListener(new SearchBtnListener(this.couInforPanel, Portal.course));
-        this.couCancelBtn.addMouseListener(new SearchBtnListener(this.couCancelPanel, Portal.course));
-        this.couDelConf.addMouseListener(new UpdateDataListener(Portal.course, Portal.delete));
+//        Cancel config
+        this.cancelSearchBtn.addMouseListener(new SearchBtnListener(this.cancelInforPanel, Portal.cancel));
+        this.cancelCancelBtn.addMouseListener(new SearchBtnListener(this.cancelCancelPanel, Portal.cancel));
+        this.cancelDelConf.addMouseListener(new UpdateDataListener(Portal.cancel, Portal.delete));
     }
 
     class LogoutListener extends MouseAdapter {
@@ -80,15 +96,49 @@ public class Portal extends javax.swing.JFrame {
     }
 
     void updateData(int entityType, int editType) {
-        if (entityType == Portal.signup) {
-            if (editType == Portal.add) {
-                JOptionPane.showMessageDialog(null, "Đăng ký thành công");
-            }
-        } else if (entityType == Portal.course) {
-            if (editType == Portal.delete) {
-                JOptionPane.showMessageDialog(null, "Hủy thành công");
+        try {
+            if (entityType == Portal.register) {
+                if (editType == Portal.add) {
+                    if (!CourseregistrationDao.isRegistered(Local.userID,
+                            this.curCourseRegister.getSubjectByIdsu().getId())) {
+                        CourseregistrationDao.add(new CourseregistrationEntity(
+                                new Timestamp(System.currentTimeMillis()),
+                                (StudentEntity) Local.user, this.curCourseRegister
+                        ));
+                        JOptionPane.showMessageDialog(null, "Đăng ký thành công");
+                        Portal.listCancel = CourseDao.getTableData(Local.userID);
+                        this.cancelTable.setModel(new DefaultTableModel(
+                                Portal.listCancel,
+                                new String[] {
+                                        "ID", "Mã môn", "Tên môn", "Số tín chỉ", "Giáo viên", "Phòng", "Thứ", "Ca"
+                                }
+                        ));
+                        this.cancelScrollPane.setViewportView(this.cancelTable);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "Môn này đã đăng ký rồi",
+                                "Đăng ký thất bại", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } else if (entityType == Portal.cancel) {
+                if (editType == Portal.delete) {
+                    CourseregistrationDao.delete(Local.userID, this.curCourseCancel.getId());
+                    JOptionPane.showMessageDialog(null, "Hủy thành công");
+                }
+                Portal.listCancel = CourseDao.getTableData(Local.userID);
+                this.cancelTable.setModel(new DefaultTableModel(
+                        Portal.listCancel,
+                        new String[] {
+                                "ID", "Mã môn", "Tên môn", "Số tín chỉ", "Giáo viên", "Phòng", "Thứ", "Ca"
+                        }
+                ));
+                this.cancelScrollPane.setViewportView(this.cancelTable);
             }
         }
+        catch(Exception ex) {
+            ex.printStackTrace();
+        }
+
     }
 
     class UpdateDataListener extends MouseAdapter {
@@ -137,16 +187,58 @@ public class Portal extends javax.swing.JFrame {
         public void mouseClicked(MouseEvent e) {
             super.mouseClicked(e); //To change body of generated methods, choose Tools | Templates.
             try {
+                boolean isExistEntity = false;
+                if (this.entityType == Portal.register) {
+                    int id = Integer.parseInt(this.portal.registerSearchField.getText());
 
-                if (this.entityType == Portal.course) {
-                    this.portal.couInforPanel.setVisible(false);
-                    this.portal.couCancelPanel.setVisible(false);
-                } else if (this.entityType == Portal.signup) {
-                    this.portal.registerInforPanel.setVisible(false);
-                    this.portal.registerCancelPanel.setVisible(false);
+                    this.portal.curCourseRegister = CourseDao.get(id);
+                    if (this.portal.curCourseRegister != null) {
+                        isExistEntity = true;
+                        this.portal.registerId.setText(Integer.toString(id));
+                        this.portal.registerName.setText(this.portal.curCourseRegister.getName());
+                        this.portal.registerYear.setText(Integer.toString(this.portal.curCourseRegister.getYear()));
+                        this.portal.registerTeacher.setText(this.portal.curCourseRegister.getTeacher());
+                        this.portal.registerRoom.setText(this.portal.curCourseRegister.getRoom());
+                        this.portal.registerDay.setText(this.portal.curCourseRegister.getDay());
+                        this.portal.registerShift.setText(Integer.toString(this.portal.curCourseRegister.getShift()));
+                        this.portal.registerSubject.setText(this.portal.curCourseRegister.getSubjectByIdsu().getName());
+                        this.portal.registerMinistry.setText(this.portal.curCourseRegister.getMinistryByIdmi().getName());
+
+                        this.portal.registerInforPanel.setVisible(false);
+                        this.portal.registerCancelPanel.setVisible(false);
+                    }
+
+                } else if (this.entityType == Portal.cancel) {
+                    int id = Integer.parseInt(this.portal.cancelSearchField.getText());
+                    this.portal.curCourseCancel = CourseDao.get(id);
+                    if (this.portal.curCourseCancel != null) {
+                        isExistEntity = true;
+                        this.portal.cancelId.setText(Integer.toString(id));
+                        this.portal.cancelName.setText(this.portal.curCourseCancel.getName());
+                        this.portal.cancelYear.setText(Integer.toString(this.portal.curCourseCancel.getYear()));
+                        this.portal.cancelTeacher.setText(this.portal.curCourseCancel.getTeacher());
+                        this.portal.cancelRoom.setText(this.portal.curCourseCancel.getRoom());
+                        this.portal.cancelDay.setText(this.portal.curCourseCancel.getDay());
+                        this.portal.cancelShift.setText(Integer.toString(this.portal.curCourseCancel.getShift()));
+                        this.portal.cancelSubject.setText(this.portal.curCourseCancel.getSubjectByIdsu().getName());
+                        this.portal.cancelMinistry.setText(this.portal.curCourseCancel.getMinistryByIdmi().getName());
+
+
+                        this.portal.cancelInforPanel.setVisible(false);
+                        this.portal.cancelCancelPanel.setVisible(false);
+                    }
+
                 }
-                this.panel.setVisible(true);
-            } catch (Exception ex) {
+                if (isExistEntity) {
+                    this.panel.setVisible(true);
+                }
+                else {
+                    JOptionPane.showMessageDialog(null, "Không tìm thấy",
+                            "Không tìm thấy", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Vui lòng nhập ID hợp lệ",
+                        "Nhập không hợp lệ", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         }
@@ -166,11 +258,11 @@ public class Portal extends javax.swing.JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             super.mouseClicked(e); //To change body of generated methods, choose Tools | Templates.
-            this.portal.courseTab.setBackground(new Color(204, 204, 204));
-            this.portal.signupTab.setBackground(new Color(204, 204, 204));
+            this.portal.cancelTab.setBackground(new Color(204, 204, 204));
+            this.portal.registerTab.setBackground(new Color(204, 204, 204));
             this.selectedTab.setBackground(new Color(102, 102, 255));
 
-            this.portal.courseContent.setVisible(false);
+            this.portal.cancelContent.setVisible(false);
             this.portal.registerContent.setVisible(false);
             this.selectedContent.setVisible(true);
         }
@@ -187,12 +279,12 @@ public class Portal extends javax.swing.JFrame {
 
         mainPane = new javax.swing.JPanel();
         paneMenu = new javax.swing.JPanel();
-        signupTab = new javax.swing.JPanel();
-        signupLabel = new javax.swing.JLabel();
-        signupIcon = new javax.swing.JLabel();
-        courseTab = new javax.swing.JPanel();
-        courseLabel = new javax.swing.JLabel();
-        courseIcon = new javax.swing.JLabel();
+        registerTab = new javax.swing.JPanel();
+        registerLabel = new javax.swing.JLabel();
+        registerIcon = new javax.swing.JLabel();
+        cancelTab = new javax.swing.JPanel();
+        cancelLabel = new javax.swing.JLabel();
+        cancelIcon = new javax.swing.JLabel();
         logoutTab = new javax.swing.JPanel();
         logoutLabel = new javax.swing.JLabel();
         logoutIcon = new javax.swing.JLabel();
@@ -227,36 +319,36 @@ public class Portal extends javax.swing.JFrame {
         minPassLabel38 = new javax.swing.JLabel();
         registerMinistry = new javax.swing.JLabel();
         registerCancelBtn = new javax.swing.JButton();
-        courseContent = new javax.swing.JPanel();
-        couScrollPane = new javax.swing.JScrollPane();
-        couTable = new javax.swing.JTable();
+        cancelContent = new javax.swing.JPanel();
+        cancelScrollPane = new javax.swing.JScrollPane();
+        cancelTable = new javax.swing.JTable();
         minInforLabel23 = new javax.swing.JLabel();
-        couSearchField = new javax.swing.JTextField();
-        couSearchBtn = new javax.swing.JButton();
-        couEditPanel = new javax.swing.JPanel();
-        couCancelPanel = new javax.swing.JPanel();
-        couInforPanel = new javax.swing.JPanel();
+        cancelSearchField = new javax.swing.JTextField();
+        cancelSearchBtn = new javax.swing.JButton();
+        cancelEditPanel = new javax.swing.JPanel();
+        cancelCancelPanel = new javax.swing.JPanel();
+        cancelInforPanel = new javax.swing.JPanel();
         minInforLabel21 = new javax.swing.JLabel();
         minIdLabel5 = new javax.swing.JLabel();
-        couId = new javax.swing.JLabel();
+        cancelId = new javax.swing.JLabel();
         minUserLabel10 = new javax.swing.JLabel();
-        couName = new javax.swing.JLabel();
+        cancelName = new javax.swing.JLabel();
         minPassLabel25 = new javax.swing.JLabel();
-        couYear = new javax.swing.JLabel();
-        couDelConf = new javax.swing.JButton();
+        cancelYear = new javax.swing.JLabel();
+        cancelDelConf = new javax.swing.JButton();
         minPassLabel26 = new javax.swing.JLabel();
-        couTeacher = new javax.swing.JLabel();
+        cancelTeacher = new javax.swing.JLabel();
         minPassLabel27 = new javax.swing.JLabel();
-        couRoom = new javax.swing.JLabel();
+        cancelRoom = new javax.swing.JLabel();
         minPassLabel28 = new javax.swing.JLabel();
-        couDay = new javax.swing.JLabel();
+        cancelDay = new javax.swing.JLabel();
         minPassLabel29 = new javax.swing.JLabel();
-        couShift = new javax.swing.JLabel();
+        cancelShift = new javax.swing.JLabel();
         minPassLabel30 = new javax.swing.JLabel();
-        couIdsubject = new javax.swing.JLabel();
+        cancelSubject = new javax.swing.JLabel();
         minPassLabel31 = new javax.swing.JLabel();
-        couIdministry = new javax.swing.JLabel();
-        couCancelBtn = new javax.swing.JButton();
+        cancelMinistry = new javax.swing.JLabel();
+        cancelCancelBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -268,60 +360,60 @@ public class Portal extends javax.swing.JFrame {
         paneMenu.setToolTipText("");
         paneMenu.setPreferredSize(new java.awt.Dimension(240, 455));
 
-        signupTab.setBackground(new java.awt.Color(102, 102, 255));
-        signupTab.setPreferredSize(new java.awt.Dimension(100, 45));
+        registerTab.setBackground(new java.awt.Color(102, 102, 255));
+        registerTab.setPreferredSize(new java.awt.Dimension(100, 45));
 
-        signupLabel.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        signupLabel.setText("Đăng ký");
-        signupLabel.setToolTipText("");
+        registerLabel.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        registerLabel.setText("Đăng ký");
+        registerLabel.setToolTipText("");
 
-        signupIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\List.png")); // NOI18N
+        registerIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\List.png")); // NOI18N
 
-        javax.swing.GroupLayout signupTabLayout = new javax.swing.GroupLayout(signupTab);
-        signupTab.setLayout(signupTabLayout);
-        signupTabLayout.setHorizontalGroup(
-                signupTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(signupTabLayout.createSequentialGroup()
+        javax.swing.GroupLayout registerTabLayout = new javax.swing.GroupLayout(registerTab);
+        registerTab.setLayout(registerTabLayout);
+        registerTabLayout.setHorizontalGroup(
+                registerTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(registerTabLayout.createSequentialGroup()
                                 .addGap(9, 9, 9)
-                                .addComponent(signupIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(registerIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(signupLabel))
+                                .addComponent(registerLabel))
         );
-        signupTabLayout.setVerticalGroup(
-                signupTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(signupTabLayout.createSequentialGroup()
+        registerTabLayout.setVerticalGroup(
+                registerTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(registerTabLayout.createSequentialGroup()
                                 .addGap(11, 11, 11)
-                                .addComponent(signupLabel)
+                                .addComponent(registerLabel)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addComponent(signupIcon, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(registerIcon, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        courseTab.setBackground(new java.awt.Color(204, 204, 204));
-        courseTab.setPreferredSize(new java.awt.Dimension(100, 45));
+        cancelTab.setBackground(new java.awt.Color(204, 204, 204));
+        cancelTab.setPreferredSize(new java.awt.Dimension(100, 45));
 
-        courseLabel.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        courseLabel.setText("Học phần");
-        courseLabel.setToolTipText("");
+        cancelLabel.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        cancelLabel.setText("Học phần");
+        cancelLabel.setToolTipText("");
 
-        courseIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Course.png")); // NOI18N
+        cancelIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Course.png")); // NOI18N
 
-        javax.swing.GroupLayout courseTabLayout = new javax.swing.GroupLayout(courseTab);
-        courseTab.setLayout(courseTabLayout);
-        courseTabLayout.setHorizontalGroup(
-                courseTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(courseTabLayout.createSequentialGroup()
+        javax.swing.GroupLayout cancelTabLayout = new javax.swing.GroupLayout(cancelTab);
+        cancelTab.setLayout(cancelTabLayout);
+        cancelTabLayout.setHorizontalGroup(
+                cancelTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(cancelTabLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(courseIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cancelIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(17, 17, 17)
-                                .addComponent(courseLabel))
+                                .addComponent(cancelLabel))
         );
-        courseTabLayout.setVerticalGroup(
-                courseTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(courseTabLayout.createSequentialGroup()
+        cancelTabLayout.setVerticalGroup(
+                cancelTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(cancelTabLayout.createSequentialGroup()
                                 .addGap(11, 11, 11)
-                                .addComponent(courseLabel)
+                                .addComponent(cancelLabel)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addComponent(courseIcon, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(cancelIcon, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         logoutTab.setBackground(new java.awt.Color(204, 204, 204));
@@ -358,17 +450,17 @@ public class Portal extends javax.swing.JFrame {
         paneMenu.setLayout(paneMenuLayout);
         paneMenuLayout.setHorizontalGroup(
                 paneMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(signupTab, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
-                        .addComponent(courseTab, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+                        .addComponent(registerTab, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+                        .addComponent(cancelTab, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
                         .addComponent(logoutTab, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
         );
         paneMenuLayout.setVerticalGroup(
                 paneMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(paneMenuLayout.createSequentialGroup()
                                 .addGap(136, 136, 136)
-                                .addComponent(signupTab, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(registerTab, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(courseTab, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cancelTab, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(logoutTab, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -582,7 +674,7 @@ public class Portal extends javax.swing.JFrame {
         registerContent.setLayout(registerContentLayout);
         registerContentLayout.setHorizontalGroup(
                 registerContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(registerEditPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE)
+                        .addComponent(registerEditPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(registerScrollPane)
                         .addGroup(registerContentLayout.createSequentialGroup()
                                 .addGap(26, 26, 26)
@@ -611,42 +703,43 @@ public class Portal extends javax.swing.JFrame {
 
         contentPane.add(registerContent);
 
-        courseContent.setBackground(new java.awt.Color(255, 255, 255));
-        courseContent.setPreferredSize(new java.awt.Dimension(800, 580));
+        cancelContent.setBackground(new java.awt.Color(255, 255, 255));
+        cancelContent.setPreferredSize(new java.awt.Dimension(800, 580));
 
         // Cho phep table sap xep
-        couTable.setModel(new javax.swing.table.DefaultTableModel(
-                Portal.listCourse,
+        cancelTable.setModel(new javax.swing.table.DefaultTableModel(
+                Portal.listCancel,
                 new String [] {
                         "ID", "Mã môn", "Tên môn", "Số tín chỉ", "Giáo viên", "Phòng", "Thứ", "Ca"
                 }
         ));
-        couScrollPane.setViewportView(couTable);
+        cancelScrollPane.setViewportView(cancelTable);
 
         minInforLabel23.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
         minInforLabel23.setText("Tìm học phần đã đăng ký");
 
-        couSearchField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        couSearchField.setText("ID");
+        cancelSearchField.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        cancelSearchField.setText("ID");
 
-        couSearchBtn.setText("Search");
 
-        couEditPanel.setLayout(new javax.swing.OverlayLayout(couEditPanel));
+        cancelSearchBtn.setText("Search");
 
-        javax.swing.GroupLayout couCancelPanelLayout = new javax.swing.GroupLayout(couCancelPanel);
-        couCancelPanel.setLayout(couCancelPanelLayout);
-        couCancelPanelLayout.setHorizontalGroup(
-                couCancelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 820, Short.MAX_VALUE)
+        cancelEditPanel.setLayout(new javax.swing.OverlayLayout(cancelEditPanel));
+
+        javax.swing.GroupLayout cancelCancelPanelLayout = new javax.swing.GroupLayout(cancelCancelPanel);
+        cancelCancelPanel.setLayout(cancelCancelPanelLayout);
+        cancelCancelPanelLayout.setHorizontalGroup(
+                cancelCancelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 800, Short.MAX_VALUE)
         );
-        couCancelPanelLayout.setVerticalGroup(
-                couCancelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        cancelCancelPanelLayout.setVerticalGroup(
+                cancelCancelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 313, Short.MAX_VALUE)
         );
 
-        couEditPanel.add(couCancelPanel);
+        cancelEditPanel.add(cancelCancelPanel);
 
-        couInforPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 0));
+        cancelInforPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 0));
 
         minInforLabel21.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
         minInforLabel21.setText("Thông tin học phần");
@@ -654,195 +747,195 @@ public class Portal extends javax.swing.JFrame {
         minIdLabel5.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minIdLabel5.setText("Id:");
 
-        couId.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couId.setText("id");
+        cancelId.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        cancelId.setText("id");
 
         minUserLabel10.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minUserLabel10.setText("Tên học phần:");
 
-        couName.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couName.setText("CTDL&GT 18CTT2");
+        cancelName.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        cancelName.setText("CTDL&GT 18CTT2");
 
         minPassLabel25.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel25.setText("Năm:");
 
-        couYear.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couYear.setText("2021");
+        cancelYear.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        cancelYear.setText("2021");
 
-        couDelConf.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        couDelConf.setText("Xóa học phần đã đăng ký");
+        cancelDelConf.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        cancelDelConf.setText("Xóa học phần đã đăng ký");
 
         minPassLabel26.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel26.setText("Giáo viên:");
 
-        couTeacher.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couTeacher.setText("Phan Thị Phương Uyên");
+        cancelTeacher.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        cancelTeacher.setText("Phan Thị Phương Uyên");
 
         minPassLabel27.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel27.setText("Phòng:");
 
-        couRoom.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couRoom.setText("E104");
+        cancelRoom.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        cancelRoom.setText("E104");
 
         minPassLabel28.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel28.setText("Thứ:");
 
-        couDay.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couDay.setText("2");
+        cancelDay.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        cancelDay.setText("2");
 
         minPassLabel29.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel29.setText("Ca:");
 
-        couShift.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couShift.setText("1");
+        cancelShift.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        cancelShift.setText("1");
 
         minPassLabel30.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel30.setText("Môn học:");
 
-        couIdsubject.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couIdsubject.setText("id môn học");
+        cancelSubject.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        cancelSubject.setText("id môn học");
 
         minPassLabel31.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
         minPassLabel31.setText("Giáo vụ:");
 
-        couIdministry.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
-        couIdministry.setText("id giáo vụ");
+        cancelMinistry.setFont(new java.awt.Font("Roboto", 0, 15)); // NOI18N
+        cancelMinistry.setText("id giáo vụ");
 
-        couCancelBtn.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        couCancelBtn.setText("Hủy");
+        cancelCancelBtn.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        cancelCancelBtn.setText("Hủy");
 
-        javax.swing.GroupLayout couInforPanelLayout = new javax.swing.GroupLayout(couInforPanel);
-        couInforPanel.setLayout(couInforPanelLayout);
-        couInforPanelLayout.setHorizontalGroup(
-                couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(couInforPanelLayout.createSequentialGroup()
+        javax.swing.GroupLayout cancelInforPanelLayout = new javax.swing.GroupLayout(cancelInforPanel);
+        cancelInforPanel.setLayout(cancelInforPanelLayout);
+        cancelInforPanelLayout.setHorizontalGroup(
+                cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(cancelInforPanelLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(minInforLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(couDelConf, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(couCancelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(cancelDelConf, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(cancelCancelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(56, 56, 56))
-                        .addGroup(couInforPanelLayout.createSequentialGroup()
+                        .addGroup(cancelInforPanelLayout.createSequentialGroup()
                                 .addGap(63, 63, 63)
-                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(couInforPanelLayout.createSequentialGroup()
+                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(cancelInforPanelLayout.createSequentialGroup()
                                                 .addComponent(minPassLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(18, 18, 18)
-                                                .addComponent(couTeacher, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE))
-                                        .addGroup(couInforPanelLayout.createSequentialGroup()
+                                                .addComponent(cancelTeacher, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE))
+                                        .addGroup(cancelInforPanelLayout.createSequentialGroup()
                                                 .addComponent(minPassLabel30, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(18, 18, 18)
-                                                .addComponent(couIdsubject, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addGroup(couInforPanelLayout.createSequentialGroup()
+                                                .addComponent(cancelSubject, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(cancelInforPanelLayout.createSequentialGroup()
                                                 .addComponent(minPassLabel28, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(18, 18, 18)
-                                                .addComponent(couDay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addGroup(couInforPanelLayout.createSequentialGroup()
-                                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(cancelDay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(cancelInforPanelLayout.createSequentialGroup()
+                                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addComponent(minPassLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(minPassLabel27, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(minPassLabel29, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(minPassLabel31, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(minIdLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
                                                 .addGap(18, 18, 18)
-                                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(couId)
-                                                        .addComponent(couYear, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(couRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(couShift, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(couIdministry, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(cancelId)
+                                                        .addComponent(cancelYear, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(cancelRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(cancelShift, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(cancelMinistry, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE))
                                                 .addGap(0, 0, Short.MAX_VALUE))
-                                        .addGroup(couInforPanelLayout.createSequentialGroup()
+                                        .addGroup(cancelInforPanelLayout.createSequentialGroup()
                                                 .addComponent(minUserLabel10)
                                                 .addGap(18, 18, 18)
-                                                .addComponent(couName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                                .addComponent(cancelName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addGap(417, 417, 417))
         );
-        couInforPanelLayout.setVerticalGroup(
-                couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(couInforPanelLayout.createSequentialGroup()
-                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(couInforPanelLayout.createSequentialGroup()
+        cancelInforPanelLayout.setVerticalGroup(
+                cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(cancelInforPanelLayout.createSequentialGroup()
+                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(cancelInforPanelLayout.createSequentialGroup()
                                                 .addComponent(minInforLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                         .addComponent(minIdLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(couId))
+                                                        .addComponent(cancelId))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                         .addComponent(minUserLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(couName)))
-                                        .addGroup(couInforPanelLayout.createSequentialGroup()
+                                                        .addComponent(cancelName)))
+                                        .addGroup(cancelInforPanelLayout.createSequentialGroup()
                                                 .addContainerGap()
-                                                .addComponent(couDelConf)
+                                                .addComponent(cancelDelConf)
                                                 .addGap(16, 16, 16)
-                                                .addComponent(couCancelBtn)))
+                                                .addComponent(cancelCancelBtn)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel25)
-                                        .addComponent(couYear))
+                                        .addComponent(cancelYear))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel26)
-                                        .addComponent(couTeacher))
+                                        .addComponent(cancelTeacher))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel27)
-                                        .addComponent(couRoom))
+                                        .addComponent(cancelRoom))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel28)
-                                        .addComponent(couDay))
+                                        .addComponent(cancelDay))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel29)
-                                        .addComponent(couShift))
+                                        .addComponent(cancelShift))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel30)
-                                        .addComponent(couIdsubject))
+                                        .addComponent(cancelSubject))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(couInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(cancelInforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(minPassLabel31)
-                                        .addComponent(couIdministry))
+                                        .addComponent(cancelMinistry))
                                 .addContainerGap(28, Short.MAX_VALUE))
         );
 
-        couEditPanel.add(couInforPanel);
+        cancelEditPanel.add(cancelInforPanel);
 
-        javax.swing.GroupLayout courseContentLayout = new javax.swing.GroupLayout(courseContent);
-        courseContent.setLayout(courseContentLayout);
-        courseContentLayout.setHorizontalGroup(
-                courseContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(couEditPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE)
-                        .addComponent(couScrollPane)
-                        .addGroup(courseContentLayout.createSequentialGroup()
+        javax.swing.GroupLayout cancelContentLayout = new javax.swing.GroupLayout(cancelContent);
+        cancelContent.setLayout(cancelContentLayout);
+        cancelContentLayout.setHorizontalGroup(
+                cancelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(cancelEditPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
+                        .addComponent(cancelScrollPane)
+                        .addGroup(cancelContentLayout.createSequentialGroup()
                                 .addGap(26, 26, 26)
-                                .addComponent(couSearchField, javax.swing.GroupLayout.PREFERRED_SIZE, 483, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cancelSearchField, javax.swing.GroupLayout.PREFERRED_SIZE, 483, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(couSearchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cancelSearchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(175, 175, 175))
-                        .addGroup(courseContentLayout.createSequentialGroup()
+                        .addGroup(cancelContentLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(minInforLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        courseContentLayout.setVerticalGroup(
-                courseContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(courseContentLayout.createSequentialGroup()
-                                .addComponent(couScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+        cancelContentLayout.setVerticalGroup(
+                cancelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(cancelContentLayout.createSequentialGroup()
+                                .addComponent(cancelScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(minInforLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(courseContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(couSearchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(couSearchBtn))
+                                .addGroup(cancelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(cancelSearchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(cancelSearchBtn))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
-                                .addComponent(couEditPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(cancelEditPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        contentPane.add(courseContent);
+        contentPane.add(cancelContent);
 
         javax.swing.GroupLayout mainPaneLayout = new javax.swing.GroupLayout(mainPane);
         mainPane.setLayout(mainPaneLayout);
@@ -880,6 +973,7 @@ public class Portal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>
 
+
     /**
      * @param args the command line arguments
      */
@@ -916,29 +1010,29 @@ public class Portal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify
+    private javax.swing.JButton cancelCancelBtn;
+    private javax.swing.JPanel cancelCancelPanel;
+    private javax.swing.JPanel cancelContent;
+    private javax.swing.JLabel cancelDay;
+    private javax.swing.JButton cancelDelConf;
+    private javax.swing.JPanel cancelEditPanel;
+    private javax.swing.JLabel cancelIcon;
+    private javax.swing.JLabel cancelId;
+    private javax.swing.JPanel cancelInforPanel;
+    private javax.swing.JLabel cancelLabel;
+    private javax.swing.JLabel cancelMinistry;
+    private javax.swing.JLabel cancelName;
+    private javax.swing.JLabel cancelRoom;
+    private javax.swing.JScrollPane cancelScrollPane;
+    private javax.swing.JButton cancelSearchBtn;
+    private javax.swing.JTextField cancelSearchField;
+    private javax.swing.JLabel cancelShift;
+    private javax.swing.JLabel cancelSubject;
+    private javax.swing.JPanel cancelTab;
+    private javax.swing.JTable cancelTable;
+    private javax.swing.JLabel cancelTeacher;
+    private javax.swing.JLabel cancelYear;
     private javax.swing.JPanel contentPane;
-    private javax.swing.JButton couCancelBtn;
-    private javax.swing.JPanel couCancelPanel;
-    private javax.swing.JLabel couDay;
-    private javax.swing.JButton couDelConf;
-    private javax.swing.JPanel couEditPanel;
-    private javax.swing.JLabel couId;
-    private javax.swing.JLabel couIdministry;
-    private javax.swing.JLabel couIdsubject;
-    private javax.swing.JPanel couInforPanel;
-    private javax.swing.JLabel couName;
-    private javax.swing.JLabel couRoom;
-    private javax.swing.JScrollPane couScrollPane;
-    private javax.swing.JButton couSearchBtn;
-    private javax.swing.JTextField couSearchField;
-    private javax.swing.JLabel couShift;
-    private javax.swing.JTable couTable;
-    private javax.swing.JLabel couTeacher;
-    private javax.swing.JLabel couYear;
-    private javax.swing.JPanel courseContent;
-    private javax.swing.JLabel courseIcon;
-    private javax.swing.JLabel courseLabel;
-    private javax.swing.JPanel courseTab;
     private javax.swing.JLabel logoutIcon;
     private javax.swing.JLabel logoutLabel;
     private javax.swing.JPanel logoutTab;
@@ -972,8 +1066,10 @@ public class Portal extends javax.swing.JFrame {
     private javax.swing.JPanel registerContent;
     private javax.swing.JLabel registerDay;
     private javax.swing.JPanel registerEditPanel;
+    private javax.swing.JLabel registerIcon;
     private javax.swing.JLabel registerId;
     private javax.swing.JPanel registerInforPanel;
+    private javax.swing.JLabel registerLabel;
     private javax.swing.JLabel registerMinistry;
     private javax.swing.JLabel registerName;
     private javax.swing.JLabel registerRoom;
@@ -982,11 +1078,9 @@ public class Portal extends javax.swing.JFrame {
     private javax.swing.JTextField registerSearchField;
     private javax.swing.JLabel registerShift;
     private javax.swing.JLabel registerSubject;
+    private javax.swing.JPanel registerTab;
     private javax.swing.JTable registerTable;
     private javax.swing.JLabel registerTeacher;
     private javax.swing.JLabel registerYear;
-    private javax.swing.JLabel signupIcon;
-    private javax.swing.JLabel signupLabel;
-    private javax.swing.JPanel signupTab;
     // End of variables declaration
 }

@@ -51,11 +51,12 @@ public class CourseregistrationDao {
         return dataTable;
     }
 
-    public static Boolean isRegistered(int idStudent, int idCourse) {
+    public static Boolean isRegistered(int idStudent, int idSubject) {
         ArrayList<CourseregistrationEntity> list =
                 (ArrayList<CourseregistrationEntity>) CourseregistrationDao.getList();
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getCourseByIdco().getId() == idCourse && list.get(i).getStudentByIdsv().getId() == idStudent) {
+            if (list.get(i).getCourseByIdco().getSubjectByIdsu().getId() == idSubject &&
+                    list.get(i).getStudentByIdsv().getId() == idStudent) {
                 return true;
             }
         }
@@ -98,6 +99,19 @@ public class CourseregistrationDao {
         transaction.commit();
         session.close();
         return true;
+    }
+
+    public static Boolean delete(int idStudent, int idCourse) {
+        ArrayList<CourseregistrationEntity> list = (ArrayList<CourseregistrationEntity>)
+                CourseregistrationDao.getList();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getStudentByIdsv().getId() == idStudent &&
+                    list.get(i).getCourseByIdco().getId() == idCourse) {
+                CourseregistrationDao.delete(list.get(i).getId());
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void deleteAll() {
