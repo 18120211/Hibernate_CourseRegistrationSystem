@@ -73,8 +73,8 @@ public class Master {
     }
 
     public static void loadDataStudent() {
-        Portal.listRegister = CourseDao.getTableData();
-        Portal.listCancel = CourseDao.getTableData(Local.userID);
+        Portal.listRegister = CourseDao.getTableData(Local.currentSemester.getId());
+        Portal.listCancel = CourseDao.getTableData(Local.currentSemester.getId(),Local.userID);
     }
 
     public void run() {

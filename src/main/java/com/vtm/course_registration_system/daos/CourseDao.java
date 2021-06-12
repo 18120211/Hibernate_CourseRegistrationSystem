@@ -37,12 +37,25 @@ public class CourseDao {
         return dataTable;
     }
 
-    public static Object[][] getTableData(int idStudent) {
+    public static Object[][] getTableData(int semesterId) {
+        ArrayList<CourseEntity> list = (ArrayList<CourseEntity>) CourseDao.getList();
+        Object[][] dataTable = new Object[list.size()][];
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getCourseregistrationsessionByIdcrs().getSemesterByIdse().getId() == semesterId) {
+                dataTable[i] = list.get(i).toArray();
+            }
+        }
+        return dataTable;
+    }
+
+    public static Object[][] getTableData(int semesterId, int idStudent) {
         ArrayList<CourseregistrationEntity> listRegistration =
                 (ArrayList<CourseregistrationEntity>)CourseregistrationDao.getList();
         ArrayList<CourseEntity> list = new ArrayList<>();
         for (int i = 0; i < listRegistration.size(); i++) {
-            if (listRegistration.get(i).getStudentByIdsv().getId() == idStudent) {
+            if (listRegistration.get(i).getStudentByIdsv().getId() == idStudent &&
+                    listRegistration.get(i).getCourseByIdco().getCourseregistrationsessionByIdcrs()
+                            .getSemesterByIdse().getId() == semesterId) {
                 list.add(listRegistration.get(i).getCourseByIdco());
             }
         }
@@ -52,6 +65,21 @@ public class CourseDao {
         }
         return dataTable;
     }
+
+//    public static Object[][] getList(int semesterId) {
+//        ArrayList<CourseEntity> tmp = (ArrayList<CourseEntity>) CourseDao.getList();
+//        ArrayList<CourseEntity> list = new ArrayList<>();
+//        for (int i = 0; i < tmp.size(); i++) {
+//            if (tmp.get(i).getCourseregistrationsessionByIdcrs().getSemesterByIdse().getId() == semesterId) {
+//                list.add(tmp.get(i));
+//            }
+//        }
+//        Object[][] tableData = new Object[list.size()][];
+//        for (int i = 0; i < list.size(); i++) {
+//            tableData[i] = list.get(i).toArray();
+//        }
+//        return tableData;
+//    }
 
     public static Boolean add(CourseEntity courseEntity) {
         if (CourseDao.get(courseEntity.getId()) != null) {
@@ -82,6 +110,13 @@ public class CourseDao {
         if (courseEntity == null) {
             return false;
         }
+        ArrayList<CourseregistrationEntity> list = (ArrayList<CourseregistrationEntity>)
+                CourseregistrationDao.getList();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getCourseByIdco().getId() == courseEntity.getId()) {
+                CourseregistrationDao.delete(list.get(i).getId());
+            }
+        }
         Session session = HibernateUtil.getSession();
         Transaction transaction = session.beginTransaction();
         session.delete(courseEntity);
@@ -89,4 +124,7 @@ public class CourseDao {
         session.close();
         return true;
     }
+
+
+
 }

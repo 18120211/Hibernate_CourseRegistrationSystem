@@ -101,19 +101,38 @@ public class Portal extends javax.swing.JFrame {
                 if (editType == Portal.add) {
                     if (!CourseregistrationDao.isRegistered(Local.userID,
                             this.curCourseRegister.getSubjectByIdsu().getId())) {
-                        CourseregistrationDao.add(new CourseregistrationEntity(
-                                new Timestamp(System.currentTimeMillis()),
-                                (StudentEntity) Local.user, this.curCourseRegister
-                        ));
-                        JOptionPane.showMessageDialog(null, "Đăng ký thành công");
-                        Portal.listCancel = CourseDao.getTableData(Local.userID);
-                        this.cancelTable.setModel(new DefaultTableModel(
-                                Portal.listCancel,
-                                new String[] {
-                                        "ID", "Mã môn", "Tên môn", "Số tín chỉ", "Giáo viên", "Phòng", "Thứ", "Ca"
-                                }
-                        ));
-                        this.cancelScrollPane.setViewportView(this.cancelTable);
+                        StudentEntity curUser = (StudentEntity)Local.user;
+                        if (!CourseregistrationDao.isSameTime(curUser, this.curCourseRegister)) {
+                            int subjectCount = CourseregistrationDao.countSubject(curUser.getId());
+                            boolean isLearn = CourseregistrationDao.countSubject(curUser.getId()) == 8 &&
+                                    CourseregistrationDao.isStudentStudentThisSubject(curUser.getId(),
+                                            this.curCourseRegister.getSubjectByIdsu().getId());
+                            if (subjectCount < 8 || (subjectCount == 8 && !isLearn)) {
+                                CourseregistrationDao.add(new CourseregistrationEntity(
+                                        new Timestamp(System.currentTimeMillis()),
+                                        (StudentEntity) Local.user, this.curCourseRegister
+                                ));
+                                JOptionPane.showMessageDialog(null, "Đăng ký thành công");
+                                Portal.listCancel = CourseDao.getTableData(Local.currentSemester.getId(), Local.userID);
+                                this.cancelTable.setModel(new DefaultTableModel(
+                                        Portal.listCancel,
+                                        new String[] {
+                                                "ID", "Mã môn", "Tên môn", "Số tín chỉ", "Giáo viên", "Phòng", "Thứ", "Ca"
+                                        }
+                                ));
+                                this.cancelScrollPane.setViewportView(this.cancelTable);
+                            }
+
+                            else {
+                                JOptionPane.showMessageDialog(null, "Số môn bạn đăng ký đã đạt tối đa",
+                                        "Đăng ký thất bại", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                        else {
+                            JOptionPane.showMessageDialog(null, "Không được đăng ký môn trùng giờ",
+                                    "Đăng ký thất bại", JOptionPane.ERROR_MESSAGE);
+                        }
+
                     }
                     else {
                         JOptionPane.showMessageDialog(null, "Môn này đã đăng ký rồi",
@@ -125,7 +144,7 @@ public class Portal extends javax.swing.JFrame {
                     CourseregistrationDao.delete(Local.userID, this.curCourseCancel.getId());
                     JOptionPane.showMessageDialog(null, "Hủy thành công");
                 }
-                Portal.listCancel = CourseDao.getTableData(Local.userID);
+                Portal.listCancel = CourseDao.getTableData(Local.currentSemester.getId(), Local.userID);
                 this.cancelTable.setModel(new DefaultTableModel(
                         Portal.listCancel,
                         new String[] {

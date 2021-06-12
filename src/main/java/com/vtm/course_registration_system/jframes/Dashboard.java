@@ -589,6 +589,12 @@ public class Dashboard extends javax.swing.JFrame {
                                 "ID", "Mã môn", "Tên môn", "Số tín chỉ", "Giáo viên", "Phòng", "Thứ", "Ca"
                         }
                 ));
+                this.regCourseTable.setModel(new DefaultTableModel(
+                        Dashboard.listCourse,
+                        new String[]{
+                                "ID", "Mã môn", "Tên môn", "Số tín chỉ", "Giáo viên", "Phòng", "Thứ", "Ca"
+                        }
+                ));
             }
             if (isValid == false) {
                 JOptionPane.showMessageDialog(null, "Vui lòng kiểm tra lại",
