@@ -6,11 +6,14 @@
 package com.vtm.course_registration_system.jframes;
 
 import com.vtm.course_registration_system.Master;
+import com.vtm.course_registration_system.configs.Local;
 import com.vtm.course_registration_system.enums.UserType;
 import com.vtm.course_registration_system.models.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JOptionPane;
+import java.net.MalformedURLException;
+import java.net.URL;
+import javax.swing.*;
 
 /**
  *
@@ -78,7 +81,12 @@ public class Login extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        hcmusIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\hcmus.png")); // NOI18N
+        try {
+            hcmusIcon.setIcon(new ImageIcon(new URL(Local.hcmusPngURL)));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+//        hcmusIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\hcmus.png")); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Roboto", 0, 18)); // NOI18N
         jLabel2.setText("Tài khoản:");

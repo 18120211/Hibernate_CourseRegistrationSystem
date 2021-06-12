@@ -8,14 +8,14 @@ import com.vtm.course_registration_system.models.CourseEntity;
 import com.vtm.course_registration_system.models.CourseregistrationEntity;
 import com.vtm.course_registration_system.models.StudentEntity;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 /*
@@ -367,7 +367,12 @@ public class Portal extends javax.swing.JFrame {
         registerLabel.setText("Đăng ký");
         registerLabel.setToolTipText("");
 
-        registerIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\List.png")); // NOI18N
+        try {
+            registerIcon.setIcon(new ImageIcon(new URL(Local.listPngURL)));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+//        registerIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\List.png")); // NOI18N
 
         javax.swing.GroupLayout registerTabLayout = new javax.swing.GroupLayout(registerTab);
         registerTab.setLayout(registerTabLayout);
@@ -395,7 +400,12 @@ public class Portal extends javax.swing.JFrame {
         cancelLabel.setText("Học phần");
         cancelLabel.setToolTipText("");
 
-        cancelIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Course.png")); // NOI18N
+        try {
+            cancelIcon.setIcon(new ImageIcon(new URL(Local.coursePngURL)));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+//        cancelIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Course.png")); // NOI18N
 
         javax.swing.GroupLayout cancelTabLayout = new javax.swing.GroupLayout(cancelTab);
         cancelTab.setLayout(cancelTabLayout);
@@ -423,7 +433,12 @@ public class Portal extends javax.swing.JFrame {
         logoutLabel.setText("Đăng xuất");
         logoutLabel.setToolTipText("");
 
-        logoutIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Logout.png")); // NOI18N
+        try {
+            logoutIcon.setIcon(new ImageIcon(new URL(Local.logoutPngURL)));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+//        logoutIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Logout.png")); // NOI18N
 
         javax.swing.GroupLayout logoutTabLayout = new javax.swing.GroupLayout(logoutTab);
         logoutTab.setLayout(logoutTabLayout);
