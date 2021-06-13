@@ -1,6 +1,7 @@
 package com.vtm.course_registration_system.daos;
 
 import com.vtm.course_registration_system.configs.HibernateUtil;
+import com.vtm.course_registration_system.models.CourseEntity;
 import com.vtm.course_registration_system.models.CourseregistrationEntity;
 import com.vtm.course_registration_system.models.CourseregistrationsessionEntity;
 import org.hibernate.Session;
@@ -57,9 +58,18 @@ public class CourseregistrationsessionDao {
         session.close();
         return true;
     }
-    public static Boolean delete(CourseregistrationsessionEntity courseregistrationsessionEntity) {
+    public static Boolean delete(int sessionId) {
+        CourseregistrationsessionEntity courseregistrationsessionEntity = CourseregistrationsessionDao.get(sessionId);
+
         if (CourseregistrationsessionDao.get(courseregistrationsessionEntity.getId()) == null) {
             return false;
+        }
+        ArrayList<CourseEntity> list = (ArrayList<CourseEntity>) CourseDao.getList();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getCourseregistrationsessionByIdcrs().getId()
+                    == courseregistrationsessionEntity.getId()) {
+                CourseDao.delete(list.get(i).getId());
+            }
         }
         Session session = HibernateUtil.getSession();
         Transaction transaction = session.beginTransaction();

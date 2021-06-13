@@ -1,6 +1,7 @@
 package com.vtm.course_registration_system.daos;
 
 import com.vtm.course_registration_system.configs.HibernateUtil;
+import com.vtm.course_registration_system.models.ClassEntity;
 import com.vtm.course_registration_system.models.MinistryEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -64,6 +65,7 @@ public class MinistryDao {
         if (ministryEntity == null) {
             return false;
         }
+//        ArrayList<ClassEntity> list = ClassDao.
         Session session = HibernateUtil.getSession();
         Transaction transaction = session.beginTransaction();
         session.delete(ministryEntity);

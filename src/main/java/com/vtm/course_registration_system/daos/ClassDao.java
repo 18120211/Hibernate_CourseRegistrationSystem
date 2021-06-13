@@ -82,19 +82,8 @@ public class ClassDao {
         session.close();
         return true;
     }
+
     public static Boolean delete(int id) {
-        ClassEntity classEntity = ClassDao.get(id);
-        if (classEntity == null) {
-            return false;
-        }
-        Session session = HibernateUtil.getSession();
-        Transaction transaction = session.beginTransaction();
-        session.delete(classEntity);
-        transaction.commit();
-        session.close();
-        return true;
-    }
-    public static Boolean deleteClassAndAllChild(int id) {
         ClassEntity classEntity = ClassDao.get(id);
         if (classEntity == null) {
             return false;
