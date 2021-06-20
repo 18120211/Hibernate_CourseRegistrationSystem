@@ -81,12 +81,14 @@ public class Login extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        try {
-            hcmusIcon.setIcon(new ImageIcon(new URL(Local.hcmusPngURL)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            hcmusIcon.setIcon(new ImageIcon(new URL(Local.hcmusPngURL)));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+
 //        hcmusIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\hcmus.png")); // NOI18N
+        hcmusIcon.setIcon(new ImageIcon(getClass().getResource("/image/hcmus.png")));
 
         jLabel2.setFont(new java.awt.Font("Roboto", 0, 18)); // NOI18N
         jLabel2.setText("Tài khoản:");

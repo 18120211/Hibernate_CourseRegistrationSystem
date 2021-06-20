@@ -1099,13 +1099,13 @@ public class Dashboard extends javax.swing.JFrame {
         ministryLabel.setText("Giáo vụ");
         ministryLabel.setToolTipText("");
 
-        try {
-            ministryIcon.setIcon(new ImageIcon(new URL(Local.ministryPngURL)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            ministryIcon.setIcon(new ImageIcon(new URL(Local.ministryPngURL)));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
 
-//        ministryIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Ministry.png")); // NOI18N
+        ministryIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/Ministry.png"))); // NOI18N
 
         javax.swing.GroupLayout ministryTabLayout = new javax.swing.GroupLayout(ministryTab);
         ministryTab.setLayout(ministryTabLayout);
@@ -1133,12 +1133,12 @@ public class Dashboard extends javax.swing.JFrame {
         subjectLabel.setText("Môn học");
         subjectLabel.setToolTipText("");
 
-        try {
-            subjectIcon.setIcon(new ImageIcon(new URL(Local.subjectPngURL)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-//        subjectIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Subject.png")); // NOI18N
+//        try {
+//            subjectIcon.setIcon(new ImageIcon(new URL(Local.subjectPngURL)));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+        subjectIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/Subject.png"))); // NOI18N
 
         javax.swing.GroupLayout subjectTabLayout = new javax.swing.GroupLayout(subjectTab);
         subjectTab.setLayout(subjectTabLayout);
@@ -1166,12 +1166,12 @@ public class Dashboard extends javax.swing.JFrame {
         semesterLabel.setText("Học kỳ");
         semesterLabel.setToolTipText("");
 
-        try {
-            semesterIcon.setIcon(new ImageIcon(new URL(Local.semesterPngURL)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-//        semesterIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Semester.png")); // NOI18N
+//        try {
+//            semesterIcon.setIcon(new ImageIcon(new URL(Local.semesterPngURL)));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+        semesterIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/Semester.png"))); // NOI18N
 
         javax.swing.GroupLayout semesterTabLayout = new javax.swing.GroupLayout(semesterTab);
         semesterTab.setLayout(semesterTabLayout);
@@ -1199,12 +1199,12 @@ public class Dashboard extends javax.swing.JFrame {
         classLabel.setText("Lớp học");
         classLabel.setToolTipText("");
 
-        try {
-            classIcon.setIcon(new ImageIcon(new URL(Local.classPngURL)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-//        classIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Class.png")); // NOI18N
+//        try {
+//            classIcon.setIcon(new ImageIcon(new URL(Local.classPngURL)));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+        classIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/Class.png"))); // NOI18N
 
         javax.swing.GroupLayout classTabLayout = new javax.swing.GroupLayout(classTab);
         classTab.setLayout(classTabLayout);
@@ -1232,12 +1232,12 @@ public class Dashboard extends javax.swing.JFrame {
         studentLabel.setText("Học sinh");
         studentLabel.setToolTipText("");
 
-        try {
-            studentIcon.setIcon(new ImageIcon(new URL(Local.studentPngURL)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-//        studentIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Student.png")); // NOI18N
+//        try {
+//            studentIcon.setIcon(new ImageIcon(new URL(Local.studentPngURL)));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+        studentIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/Student.png"))); // NOI18N
 
         javax.swing.GroupLayout studentTabLayout = new javax.swing.GroupLayout(studentTab);
         studentTab.setLayout(studentTabLayout);
@@ -1265,12 +1265,12 @@ public class Dashboard extends javax.swing.JFrame {
         sessionLabel.setText("Kỳ học phần");
         sessionLabel.setToolTipText("");
 
-        try {
-            sessionIcon.setIcon(new ImageIcon(new URL(Local.sessionPngURL)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-//        sessionIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Session.png")); // NOI18N
+//        try {
+//            sessionIcon.setIcon(new ImageIcon(new URL(Local.sessionPngURL)));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+        sessionIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/Session.png"))); // NOI18N
 
         javax.swing.GroupLayout sessionTabLayout = new javax.swing.GroupLayout(sessionTab);
         sessionTab.setLayout(sessionTabLayout);
@@ -1298,12 +1298,12 @@ public class Dashboard extends javax.swing.JFrame {
         courseLabel.setText("Học phần");
         courseLabel.setToolTipText("");
 
-        try {
-            courseIcon.setIcon(new ImageIcon(new URL(Local.coursePngURL)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-//        courseIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Course.png")); // NOI18N
+//        try {
+//            courseIcon.setIcon(new ImageIcon(new URL(Local.coursePngURL)));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+        courseIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/Course.png"))); // NOI18N
 
         javax.swing.GroupLayout courseTabLayout = new javax.swing.GroupLayout(courseTab);
         courseTab.setLayout(courseTabLayout);
@@ -1331,12 +1331,12 @@ public class Dashboard extends javax.swing.JFrame {
         lStudentCourseLabel.setText("Danh sách");
         lStudentCourseLabel.setToolTipText("");
 
-        try {
-            lStudentCourseIcon.setIcon(new ImageIcon(new URL(Local.listPngURL)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-//        lStudentCourseIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\List.png")); // NOI18N
+//        try {
+//            lStudentCourseIcon.setIcon(new ImageIcon(new URL(Local.listPngURL)));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+        lStudentCourseIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/List.png"))); // NOI18N
 
         javax.swing.GroupLayout lStudentCourseTabLayout = new javax.swing.GroupLayout(lStudentCourseTab);
         lStudentCourseTab.setLayout(lStudentCourseTabLayout);
@@ -1364,12 +1364,12 @@ public class Dashboard extends javax.swing.JFrame {
         logoutLabel.setText("Đăng xuất");
         logoutLabel.setToolTipText("");
 
-        try {
-            logoutIcon.setIcon(new ImageIcon(new URL(Local.logoutPngURL)));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-//        logoutIcon.setIcon(new javax.swing.ImageIcon("C:\\Users\\minht\\Desktop\\Logout.png")); // NOI18N
+//        try {
+//            logoutIcon.setIcon(new ImageIcon(new URL(Local.logoutPngURL)));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+        logoutIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/Logout.png"))); // NOI18N
 
         javax.swing.GroupLayout logoutTabLayout = new javax.swing.GroupLayout(logoutTab);
         logoutTab.setLayout(logoutTabLayout);

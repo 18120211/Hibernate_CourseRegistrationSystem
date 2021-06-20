@@ -8,6 +8,26 @@
 - Đồ án môn học số 3-Hệ thống quản lý đăng ký học phần cho Sinh Viên
 - Yêu cầu đồ án: [Here](https://drive.google.com/file/d/1yFsjstaQqR16FSlkQ2SjpWVgn7JQ0gyw/view)
 
+## Hướng dẫn chạy đồ án
+**Chuẩn bị:**
+- Cài đặt Java sdk phiển bản 8 trở lên
+- Cài đặt Mysql service 
+- Cài đặt Mysql Mysql workbench(Hoặc 1 trình thực thi mysql script)
+- Cài đặt IDEA intellij
+
+**Thực hiện:**
+- Chạy `SqlScipt.sql`
+- Tạo một Mysql connection, tiếp tục cấu hình tập tin `/src/main/resources/hibernate.cfg.xml` cho phù hợp với connection
+``` xml
+    <property name="connection.username"></property>
+    <property name="connection.password"></property>
+```
+- Build project
+- Chạy method main ở class `src/main/java/com/vtm/course_registration_system/App.java`
+
+
+
+
 ## Công nghệ được sử dụng trong đồ án
 - IDEA: Intellij
 - Programing language: Java  
