@@ -1,4 +1,4 @@
-# Hibernate_CourseRegistrationSystem
+# Hibernate_CourseRegistrationSystem - Ứng dụng đăng ký học phần
 ## Thông tin tác giả
 - Họ tên: Võ Thế Minh
 - Liên lạc: minhthevo123@gmail.com
@@ -12,7 +12,7 @@
 **Chuẩn bị:**
 - Cài đặt Java sdk phiển bản 8 trở lên
 - Cài đặt Mysql service 
-- Cài đặt Mysql Mysql workbench(Hoặc 1 trình thực thi mysql script)
+- Cài đặt Mysql workbench(Hoặc 1 trình thực thi mysql script)
 - Cài đặt IDEA intellij
 
 **Thực hiện:**
